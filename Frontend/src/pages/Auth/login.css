@@ -1,0 +1,253 @@
+:root {
+    --indigo-600: #4f46e5;
+    --indigo-700: #4338ca;
+    --indigo-50: #eef2ff;
+    --slate-900: #0f172a;
+    --slate-800: #1e293b;
+    --slate-600: #475569;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+    --coffee-dark: #3e2723;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.portal-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn { 
+    from { opacity: 0; transform: translateY(10px); } 
+    to { opacity: 1; transform: translateY(0); } 
+}
+
+/* --- BÊN TRÁI: HERO --- */
+.portal-hero-section {
+    width: 55%;
+    height: 100%;
+    background: url('/cf.png') no-repeat center;
+    background-size: cover;
+}
+
+.hero-overlay {
+    background: linear-gradient(135deg, rgba(62, 39, 35, 0.92) 0%, rgba(15, 23, 42, 0.85) 100%);
+    height: 100%;
+    padding: 80px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    color: white;
+}
+
+.brand-label {
+    font-weight: 800;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.highlight { color: #d2c1b0; }
+
+.hero-description {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    color: #e2e8f0;
+    max-width: 500px;
+    margin-top: 24px;
+}
+
+.hero-footer {
+    position: absolute;
+    bottom: 40px;
+    display: flex;
+    gap: 40px;
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+/* --- BÊN PHẢI: FORM --- */
+.portal-form-section {
+    width: 45%;
+    height: 100%;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px;
+    position: relative;
+}
+
+.top-right-logo {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+}
+
+.top-right-logo img {
+    height: 60px;
+    width: auto;
+}
+
+.form-wrapper {
+    width: 100%;
+    max-width: 400px;
+}
+
+.welcome-text-group {
+    margin-bottom: 40px;
+}
+
+.form-welcome {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--slate-900);
+}
+
+.form-subtitle { color: var(--slate-600); font-size: 1rem; margin-top: 8px; }
+
+/* INPUT STYLING */
+.input-field {
+    margin-bottom: 24px;
+}
+
+.input-field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--slate-800);
+}
+
+.input-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    font-size: 1.2rem;
+    z-index: 2;
+}
+
+.input-icon-wrapper input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    background: var(--slate-50);
+    border: 1.5px solid var(--slate-100);
+    border-radius: 12px;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+.input-icon-wrapper input:focus {
+    border-color: var(--indigo-600);
+    background: white;
+    box-shadow: 0 0 0 4px var(--indigo-50);
+}
+
+.eye-toggle {
+    position: absolute;
+    right: 16px;
+    cursor: pointer;
+    z-index: 2;
+    font-size: 1.2rem;
+}
+
+/* OPTIONS & LINKS */
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 0.9rem;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--slate-600);
+    cursor: pointer;
+}
+
+.link {
+    color: var(--indigo-600);
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.link:hover { text-decoration: underline; }
+
+/* BUTTONS */
+.btn-portal-submit {
+    width: 100%;
+    padding: 16px;
+    background: var(--coffee-dark);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-bottom: 30px;
+}
+
+.btn-portal-submit:hover {
+    background: #2b1b18;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.form-footer-actions {
+    display: flex;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--slate-100);
+}
+
+.btn-outline {
+    flex: 1;
+    padding: 12px;
+    border: 1.5px solid var(--slate-200);
+    background: transparent;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--slate-600);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-outline:hover {
+    background: var(--slate-50);
+    color: var(--slate-900);
+    border-color: var(--slate-400);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+    .portal-hero-section { display: none; }
+    .portal-form-section { width: 100%; }
+}
