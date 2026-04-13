@@ -1,0 +1,202 @@
+version: '3.8'
+
+services:
+  # ==========================================
+  # 0. DATABASE: SQL SERVER
+  # ==========================================
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: cafe-database
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=CafePos@123456
+    ports:
+      - "1434:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 1. BACKEND: SERVICE CAFE (Cổng 8081)
+  # ==========================================
+  service-cafe:
+    build: ./Backend/ServiceCafe
+    container_name: cafe-service-cafe
+    ports:
+      - "8081:8081"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceCafe;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 2. BACKEND: SERVICE PROMOTION (Cổng 8082)
+  # ==========================================
+  service-promotion:
+    build: ./Backend/ServicePromotion
+    container_name: cafe-service-promotion
+    ports:
+      - "8082:8082"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServicePromotion;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 3. BACKEND: SERVICE TABLE (Cổng 8083)
+  # ==========================================
+  service-table:
+    build: ./Backend/ServiceTable
+    container_name: cafe-service-table
+    ports:
+      - "8083:8083"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceTable;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 4. BACKEND: SERVICE DOANH THU (Cổng 8084)
+  # ==========================================
+  service-doanh-thu:
+    build: ./Backend/ServiceDoanhThu
+    container_name: cafe-service-doanh-thu
+    ports:
+      - "8084:8084" 
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceDoanhThu;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 5. BACKEND: SERVICE SALARY (Cổng 8085)
+  # ==========================================
+  service-salary:
+    build: ./Backend/ServiceSalary
+    container_name: cafe-service-salary
+    ports:
+      - "8085:8085"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceSalary;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 6. BACKEND: SERVICE USER (Cổng 8086)
+  # ==========================================
+  service-user:
+    build: ./Backend/ServiceUser
+    container_name: cafe-service-user
+    ports:
+      - "8086:8086"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceUser;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 7. BACKEND: SERVICE PRODUCT (Cổng 8087)
+  # ==========================================
+  service-product:
+    build: ./Backend/ServiceProduct
+    container_name: cafe-service-product
+    ports:
+      - "8087:8087"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceProduct;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 8. BACKEND: SERVICE STORE (Cổng 8088)
+  # ==========================================
+  service-store:
+    build: ./Backend/ServiceStore
+    container_name: cafe-service-store
+    ports:
+      - "8088:8088"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceStore;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 9. BACKEND: SERVICE NOTIFICATION (Cổng 8089)
+  # ==========================================
+  service-notification:
+    build: ./Backend/ServiceNotification
+    container_name: cafe-service-notification
+    ports:
+      - "8089:8089"
+    depends_on:
+      - sqlserver
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://sqlserver:1433;databaseName=ServiceNotification;encrypt=true;trustServerCertificate=true;
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=CafePos@123456
+    networks:
+      - cafe-network
+
+  # ==========================================
+  # 11. FRONTEND: REACTJS
+  # ==========================================
+  frontend:
+    build: ./Frontend
+    container_name: cafe-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - service-cafe
+      - service-promotion
+      - service-table
+      - service-doanh-thu
+      - service-salary
+      - service-user
+      - service-product
+      - service-store
+      - service-notification
+    networks:
+      - cafe-network
+
+# ==========================================
+# CẤU HÌNH MẠNG & Ổ ĐĨA DỮ LIỆU
+# ==========================================
+networks:
+  cafe-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:

@@ -6,9 +6,8 @@ const SanPhamForm = ({ isEditing, initialData, initialCongThuc, khoNguyenLieu, l
     const [formData, setFormData] = useState(initialData || {
         maSanPham: 'SP' + Date.now(), 
         tenSanPham: '', 
-        donGia: '', 
-        maLoaiSanPham: 'LSP01', 
-        trangThai: 'Đang bán', 
+        donGia:'', 
+        maLoaiSanPham: loaiSanPhams && loaiSanPhams.length > 0 ? loaiSanPhams[0].maLoaiSanPham : '',        trangThai: 'Đang bán', 
         duongDanHinh: ''
     });
 
@@ -65,32 +64,32 @@ const SanPhamForm = ({ isEditing, initialData, initialCongThuc, khoNguyenLieu, l
 
     // LƯU THÔNG TIN SẢN PHẨM
     const handleLuuThongTin = async () => {
-        if(!formData.maSanPham || !formData.tenSanPham) return alert("Vui lòng nhập Mã và Tên sản phẩm!");
+    if(!formData.maSanPham || !formData.tenSanPham) return alert("Vui lòng nhập Mã và Tên sản phẩm!");
 
-        const payload = {
-            maSanPham: formData.maSanPham,
-            tenSanPham: formData.tenSanPham,
-            donGia: formData.donGia,
-            trangThai: formData.trangThai,
-            duongDanHinh: formData.duongDanHinh, 
-            loaiSanPham: { maLoaiSanPham: formData.maLoaiSanPham },
-            danhSachCongThuc: congThuc.map(ct => ({
-                id: { maSanPham: formData.maSanPham, maNguyenLieu: ct.maNguyenLieu },
-                nguyenLieu: { maNguyenLieu: ct.maNguyenLieu },
-                soLuong: ct.soLuong
-            }))
-        };
-
-        try {
-            await api.post('/san-pham', payload);
-            alert("Lưu dữ liệu thành công!");
-            onRefresh(); // Load lại dữ liệu ở component cha
-            onClose();   // Tắt form
-        } catch (error) {
-            console.error(error);
-            alert("Có lỗi khi lưu sản phẩm!");
-        }
+    const payload = {
+        maSanPham: formData.maSanPham,
+        tenSanPham: formData.tenSanPham,
+        donGia: Number(formData.donGia || 0),
+        trangThai: formData.trangThai,
+        duongDanHinh: formData.duongDanHinh, 
+        loaiSanPham: { maLoaiSanPham: formData.maLoaiSanPham },
+        danhSachCongThuc: congThuc.map(ct => ({
+            id: { maSanPham: formData.maSanPham, maNguyenLieu: ct.maNguyenLieu },
+            // Đã xóa dòng nguyenLieu ở đây
+            soLuong: ct.soLuong
+        }))
     };
+    console.log("🚀 Payload gửi đi:", payload);
+    try {
+        await api.post('/san-pham', payload);
+        alert("Lưu dữ liệu thành công!");
+        onRefresh();
+        onClose(); 
+    } catch (error) {
+        console.error(error);
+        alert("Có lỗi khi lưu sản phẩm!");
+    }
+};
 
    return (
     <div className="sp-form-wrapper">

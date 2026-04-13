@@ -36,7 +36,10 @@ const ReceiptModal = ({
                         {cart.map((item, i) => (
                             <tr key={`${item.maSanPham}-${i}`}>
                                 <td>{i + 1}</td>
-                                <td>{item.tenSanPham}</td>
+                                <td>
+                                    <div>{item.tenSanPham}</div>
+                                    {item.ghiChu && <div style={{ fontSize: '12px', color: '#666' }}>— {item.ghiChu}</div>}
+                                </td>
                                 <td>{item.soLuong}</td>
                                 <td className="text-right">{(item.giaBan * item.soLuong).toLocaleString()}</td>
                             </tr>

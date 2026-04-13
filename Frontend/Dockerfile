@@ -1,8 +1,17 @@
-FROM node:18-alpine
+# 1. Đổi sang Node 20
+FROM node:20-alpine
+
 WORKDIR /app
+
 COPY package*.json ./
 RUN npm install
+
 COPY . .
-RUN npm run build
-# Sử dụng thư viện phục vụ file tĩnh hoặc chạy dev mode (tùy ông)
+
+# 2. TẠM THỜI XÓA dòng này nếu bạn chỉ muốn chạy dev mode
+# RUN npm run build 
+
+EXPOSE 5173
+
+# Chạy lệnh dev
 CMD ["npm", "run", "dev"]

@@ -21,7 +21,7 @@ import {
 import EventPromoGrid from '../../components/Promotion/EventPromoGrid';
 import PromoTypeTable from '../../components/Promotion/PromoTypeTable';
 import PromotionModal from '../../components/Promotion/PromotionModal';
-import './PromotionPage.css';
+import './promotionPage.css';
 import { promoApi } from '../../api/promotionAPI';
 
 

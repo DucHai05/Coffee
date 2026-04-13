@@ -113,8 +113,18 @@ const OrderPage = () => {
                 if (orderRes.data && orderRes.data.items?.length > 0) {
                     const data = orderRes.data;
                     let idTuXuLy = data.maHoaDon || data.items[0].maChiTietHD.split('CTHD')[0];
-                    setCart(data.items);
-                    setOriginalCart(data.items);
+                    
+                    // Thêm tenSanPham từ products list nếu item không có
+                    const itemsWithNames = data.items.map(item => {
+                        const product = prodRes.data.find(p => p.maSanPham === item.maSanPham);
+                        return {
+                            ...item,
+                            tenSanPham: product?.tenSanPham || item.tenSanPham || item.maSanPham
+                        };
+                    });
+                    
+                    setCart(itemsWithNames);
+                    setOriginalCart(itemsWithNames);
                     setMaHoaDon(idTuXuLy);
                 } else {
                     setCart([]);
@@ -153,7 +163,7 @@ const OrderPage = () => {
                     items: cart.map(i => ({ 
                         maSanPham: i.maSanPham, 
                         soLuong: i.soLuong, 
-                        giaBan: i.donGia, 
+                        giaBan: i.giaBan, 
                         ghiChu: i.ghiChu || "" 
                     })),
                     tongTien: totalAmount
@@ -231,7 +241,7 @@ const OrderPage = () => {
     const addToCart = (p) => {
         const existing = cart.find(i => i.maSanPham === p.maSanPham);
         if (existing) setCart(cart.map(i => i.maSanPham === p.maSanPham ? { ...i, soLuong: i.soLuong + 1 } : i));
-        else setCart([...cart, { ...p, soLuong: 1 }]);
+        else setCart([...cart, { ...p, giaBan: p.giaBan || p.donGia, soLuong: 1 }]);
     };
 
 
@@ -267,7 +277,7 @@ const OrderPage = () => {
                                 <PhanLoaiCard 
                                     key={p.maSanPham}
                                     title={p.tenSanPham}
-                                    subtitle={p.giaTien?.toLocaleString('vi-VN')} đ
+                                    subtitle={p.giaBan?.toLocaleString('vi-VN')} đ
                                     image={p.duongDanHinh}
                                     onClick={() => addToCart(p)}
                                     type="product"

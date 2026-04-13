@@ -4,7 +4,9 @@ import "./salary.css";
 
 function SalaryManagement() {
     const [salaryData, setSalaryData] = useState([]);
-    const [filter, setFilter] = useState({ thang: 4, nam: 2026 });
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth() + 1;
+    const [filter, setFilter] = useState({ thang: currentMonth, nam: currentYear });
     const [loading, setLoading] = useState(false);
     const [employeeNames, setEmployeeNames] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
@@ -96,17 +98,24 @@ function SalaryManagement() {
     const handleThanhToan = async (maNV) => {
         if (window.confirm(`Xác nhận thanh toán cho nhân viên này?`)) {
             try {
-                // Sửa API thanh toán theo nhân viên và kỳ lương
                 const token = localStorage.getItem("token");
+                console.log(`📤 Thanh toán nhân viên ${maNV} tháng ${filter.thang}/${filter.nam}`);
+                
                 await axios.put(`http://localhost:8085/api/salary/pay/${maNV}`, null, {
-                    params: { thang: filter.thang, nam: filter.nam },
+                    params: { 
+                        thang: parseInt(filter.thang), 
+                        nam: parseInt(filter.nam) 
+                    },
                     headers: {
-                        Authorization: `Bearer ${token}` // Gửi kèm token
+                        Authorization: `Bearer ${token}`
                     }
                 });
                 alert("Thanh toán thành công!");
                 loadData();
-            } catch { alert("Lỗi khi thanh toán!"); }
+            } catch (error) {
+                console.error("❌ Lỗi thanh toán:", error);
+                alert("Lỗi khi thanh toán!");
+            }
         }
     };
 
@@ -114,17 +123,30 @@ function SalaryManagement() {
         setLoading(true);
         try {
             const token = localStorage.getItem("token");
-            const data = { thang: parseInt(filter.thang), nam: parseInt(filter.nam) };
-            await axios.post(`http://localhost:8085/api/salary/calculate-all`, data,{
+            const thang = parseInt(filter.thang);
+            const nam = parseInt(filter.nam);
+            
+            // Validation
+            if (isNaN(thang) || isNaN(nam) || thang < 1 || thang > 12 || nam < 2000) {
+                alert("Tháng/Năm không hợp lệ!");
+                setLoading(false);
+                return;
+            }
+            
+            const data = { thang, nam };
+            console.log("📤 Gửi request tính lương:", data);
+            
+            await axios.post(`http://localhost:8085/api/salary/calculate-all`, data, {
                 headers: {
-                    Authorization: `Bearer ${token}` // Gửi kèm token
+                    Authorization: `Bearer ${token}`
                 }
             });
             alert("Đã tổng hợp lương thành công!");
             loadData();
         } catch (error) {
-            const message = error.response?.data || "Lỗi tính lương!";
-            alert(message);
+            console.error("❌ Lỗi tính lương:", error);
+            const message = error.response?.data?.message || error.response?.data || "Lỗi tính lương!";
+            alert(`Lỗi: ${typeof message === 'string' ? message : JSON.stringify(message)}`);
         }
         finally { setLoading(false); }
     };
@@ -134,22 +156,36 @@ function SalaryManagement() {
         if (!newAdj.soTien || !newAdj.ghiChu) return alert("Nhập đủ tiền và lý do!");
         try {
             const token = localStorage.getItem("token");
-            await axios.post("http://localhost:8085/api/salary/create", {
+            const soTien = parseFloat(newAdj.soTien);
+            
+            if (isNaN(soTien) || soTien <= 0) {
+                alert("Số tiền phải > 0!");
+                return;
+            }
+            
+            const payload = {
                 maNhanVien: selectedItem.maNhanVien,
                 loaiPhieu: newAdj.loaiPhieu,
-                soTien: parseFloat(newAdj.soTien),
-                thang: filter.thang,
-                nam: filter.nam,
+                soTien: soTien,
+                thang: parseInt(filter.thang),
+                nam: parseInt(filter.nam),
                 ghiChu: newAdj.ghiChu
-            },{
+            };
+            
+            console.log("📤 Thêm điều chỉnh:", payload);
+            
+            await axios.post("http://localhost:8085/api/salary/create", payload, {
                 headers: {
-                    Authorization: `Bearer ${token}` // Gửi kèm token
+                    Authorization: `Bearer ${token}`
                 }
             });
             alert("Đã thêm điều chỉnh!");
             setNewAdj({ loaiPhieu: 'THUONG', soTien: '', ghiChu: '' });
             loadData();
-        } catch { alert("Chỉ có thể có tối đa 1 phiếu lương và 1 phiếu phạt!");
+        } catch (error) {
+            console.error("❌ Lỗi thêm điều chỉnh:", error);
+            const message = error.response?.data?.message || error.response?.data || "Chỉ có thể có tối đa 1 phiếu lương và 1 phiếu phạt!";
+            alert(typeof message === 'string' ? message : JSON.stringify(message));
             setNewAdj({ loaiPhieu: 'THUONG', soTien: '', ghiChu: '' });
         }
     };
@@ -166,9 +202,24 @@ function SalaryManagement() {
             <div className="salary-content">
                 <div className="header-actions">
                     <div className="filter-group">
-                        <select onChange={(e) => setFilter({...filter, thang: parseInt(e.target.value)})}>
-                            <option value="4">Tháng 04/2026</option>
-                            <option value="3">Tháng 03/2026</option>
+                        <select value={filter.thang} onChange={(e) => setFilter({...filter, thang: parseInt(e.target.value)})}>
+                            <option value="1">Tháng 01</option>
+                            <option value="2">Tháng 02</option>
+                            <option value="3">Tháng 03</option>
+                            <option value="4">Tháng 04</option>
+                            <option value="5">Tháng 05</option>
+                            <option value="6">Tháng 06</option>
+                            <option value="7">Tháng 07</option>
+                            <option value="8">Tháng 08</option>
+                            <option value="9">Tháng 09</option>
+                            <option value="10">Tháng 10</option>
+                            <option value="11">Tháng 11</option>
+                            <option value="12">Tháng 12</option>
+                        </select>
+                        <select value={filter.nam} onChange={(e) => setFilter({...filter, nam: parseInt(e.target.value)})}>
+                            <option value="2024">Năm 2024</option>
+                            <option value="2025">Năm 2025</option>
+                            <option value="2026">Năm 2026</option>
                         </select>
                         <input type="text" placeholder="Tìm kiếm..." className="search-input" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
                     </div>
