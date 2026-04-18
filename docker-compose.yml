@@ -9,11 +9,16 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=CafePos@123456
     ports:
-      - "1434:1433"
+      - "1433:1433" # Đổi lại 1433 để đồng bộ với URL kết nối bên dưới
     volumes:
       - sqlserver_data:/var/opt/mssql
+      # MAPPING FILE KHỞI TẠO VÀO CONTAINER
+      - ./db-init/init.sql:/usr/config/init.sql
+      - ./db-init/entrypoint.sh:/usr/config/entrypoint.sh
     networks:
       - cafe-network
+    # LỆNH CHẠY SCRIPT ĐỢI DB KHỞI ĐỘNG XONG MỚI BƠM DỮ LIỆU
+    entrypoint: /bin/bash -c "/opt/mssql/bin/sqlservr & /usr/config/entrypoint.sh & wait"
 
   # ==========================================
   # EUREKA SERVER: Trung tâm đăng ký dịch vụ
