@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import { doanhthuApi, hoaDonApi } from '../../api/APIGateway';
 import {
   ChevronLeft,
   Clock,
@@ -18,9 +18,6 @@ import {
 } from 'lucide-react';
 import './CaDetail.css';
 
-const API_URL_DOANHTHU = 'http://localhost:8084/api/doanhthu';
-const API_URL_HOADON = 'http://localhost:8081/api/hoadon';
-
 const CaDetail = ({ ca, onBack }) => {
     const [searchText, setSearchText] = useState('');
     const [category, setCategory] = useState('Tất cả');
@@ -34,8 +31,8 @@ const CaDetail = ({ ca, onBack }) => {
             try {
                 setLoading(true);
                 const [resDoanhThu, resHoaDon] = await Promise.all([
-                    axios.get(`${API_URL_DOANHTHU}/ca/${ca.maCa}`),
-                    axios.get(`${API_URL_HOADON}/ca/${ca.maCa}`)
+                    doanhthuApi.getByCa(ca.maCa),
+                    hoaDonApi.getByCa(ca.maCa)
                 ]);
 
                 if (resDoanhThu.data) {

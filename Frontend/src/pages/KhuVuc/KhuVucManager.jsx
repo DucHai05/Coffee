@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { khuVucApi } from '../../api/APIGateway';
 import { 
   Map, 
   Plus, 
@@ -12,8 +12,6 @@ import {
   ChevronRight
 } from 'lucide-react';
 import './KhuVucManager.css';
-
-const API_URL = 'http://localhost:8083/api/khuvuc';
 
 const KhuVucManager = ({ onSelectKhuVuc }) => {
     const [khuVucs, setKhuVucs] = useState([]);
@@ -33,7 +31,7 @@ const KhuVucManager = ({ onSelectKhuVuc }) => {
 
     const fetchKhuVucs = async () => {
         try {
-            const response = await axios.get(API_URL);
+            const response = await khuVucApi.getAll();
             setKhuVucs(response.data);
         } catch (error) {
             showMessage("Không thể tải danh sách khu vực", true);
@@ -55,7 +53,7 @@ const KhuVucManager = ({ onSelectKhuVuc }) => {
         }
 
         try {
-            await axios.post(API_URL, formData);
+            await khuVucApi.create(formData);
             showMessage("Thêm khu vực mới thành công");
             fetchKhuVucs();
             handleResetSelection();
@@ -70,7 +68,7 @@ const KhuVucManager = ({ onSelectKhuVuc }) => {
             return;
         }
         try {
-            await axios.put(`${API_URL}/${formData.maKhuVuc}`, formData);
+            await khuVucApi.update(formData.maKhuVuc, formData);
             showMessage("Cập nhật thành công");
             fetchKhuVucs();
             setSelectedKhuVuc({ ...selectedKhuVuc, ...formData });
@@ -82,7 +80,7 @@ const KhuVucManager = ({ onSelectKhuVuc }) => {
     const handleDelete = async (id) => {
         if (window.confirm("Xóa khu vực này sẽ xóa toàn bộ bàn bên trong. Tiếp tục?")) {
             try {
-                await axios.delete(`${API_URL}/${id}`);
+                await khuVucApi.delete(id);
                 fetchKhuVucs();
                 showMessage("Đã xóa khu vực");
                 handleResetSelection();

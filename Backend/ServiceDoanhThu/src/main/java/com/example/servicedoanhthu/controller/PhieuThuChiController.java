@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/phieuthuchi")
+@RequestMapping("/phieuthuchi")
 @CrossOrigin(origins = "*")
 public class PhieuThuChiController {
     @Autowired

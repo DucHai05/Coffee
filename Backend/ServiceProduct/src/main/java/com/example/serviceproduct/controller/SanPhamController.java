@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/san-pham")
+@RequestMapping("/v1/san-pham")
 @RequiredArgsConstructor
 @CrossOrigin("http://localhost:5173") // Cho phép Frontend (React/Vue/Swing call API)
 public class SanPhamController {

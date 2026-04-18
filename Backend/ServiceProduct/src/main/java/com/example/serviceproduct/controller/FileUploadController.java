@@ -9,7 +9,7 @@ import java.nio.file.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/v1/upload")
+@RequestMapping("/v1/upload")
 @CrossOrigin("http://localhost:5173")
 public class FileUploadController {
     // Đường dẫn này phải khớp với cấu hình trong application.properties

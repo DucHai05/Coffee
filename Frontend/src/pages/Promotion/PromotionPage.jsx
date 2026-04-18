@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { 
   Gift, 
   Plus, 
@@ -22,7 +21,7 @@ import EventPromoGrid from '../../components/Promotion/EventPromoGrid';
 import PromoTypeTable from '../../components/Promotion/PromoTypeTable';
 import PromotionModal from '../../components/Promotion/PromotionModal';
 import './promotionPage.css';
-import { promoApi } from '../../api/promotionAPI';
+import { promoApi } from '../../api/APIGateway';
 
 
 const PromotionPage = () => {

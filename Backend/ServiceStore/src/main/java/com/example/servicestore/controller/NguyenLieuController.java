@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/nguyen-lieu")
+@RequestMapping("/nguyen-lieu")
 @RequiredArgsConstructor
 public class   NguyenLieuController {
     private final NguyenLieuRepository nguyenLieuRepository;

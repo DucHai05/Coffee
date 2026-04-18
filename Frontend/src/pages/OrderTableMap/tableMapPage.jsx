@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Layout } from 'lucide-react';
-import { tableApi } from '../../api/tableAPI';
+import { tableApi } from '../../api/APIGateway';
 import CategoryTab from '../../components/Common/CategoryTab';
 import TableCard from '../../components/TableCard/TableCard';
 import './tableMapPage.css';

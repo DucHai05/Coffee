@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { authApi } from "../../api/APIGateway";
 import "./register.css";
-import { register } from "../../api/authService";
 
 function Register() {
     const [form, setForm] = useState({
@@ -30,7 +30,7 @@ function Register() {
         }
 
         try {
-            await register({
+            await authApi.register({
                 tenNhanVien: form.tenNhanVien,
                 ngaySinh: form.ngaySinh,
                 tenDangNhap: form.email,
@@ -38,9 +38,9 @@ function Register() {
                 xacNhanMK: form.matKhau
             });
             alert("Đăng ký thành công!");
-            navigate("/");
+            navigate("/login");
         } catch (error) {
-            alert(error.response?.data?.error || "Lỗi đăng ký!");
+            alert(error.response?.data?.message || "Lỗi đăng ký!");
         }
     };
 

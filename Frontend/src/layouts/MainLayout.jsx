@@ -4,7 +4,7 @@ import {
   LayoutDashboard, TableProperties, ClipboardList, 
   History, Settings, LogOut, Bell, UserCircle
 } from 'lucide-react';
-import axios from 'axios';
+import { notificationApi } from '../api/APIGateway';
 import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
@@ -49,12 +49,12 @@ const MainLayout = () => {
     // 1. Lấy danh sách thông báo cũ từ Database khi vừa mở trang
     const fetchNotifications = async () => {
       try {
-        const resList = await axios.get(`http://localhost:8089/api/notifications/list/${maNhanVien}`);
-        const resCount = await axios.get(`http://localhost:8089/api/notifications/unread-count/${maNhanVien}`);
+        const resList = await notificationApi.getByEmployee(maNhanVien);
+        const resCount = await notificationApi.getUnreadCount(maNhanVien);
         setNotifications(resList.data);
         setUnreadCount(resCount.data);
       } catch (error) {
-        console.error("Không thể kết nối tới Notification Service (Cổng 8089):", error);
+        console.error("Không thể kết nối tới Notification Service qua API Gateway:", error);
       }
     };
     fetchNotifications();
@@ -106,7 +106,7 @@ const MainLayout = () => {
   const handleReadNotification = async (tb) => {
     if (!tb.daDoc) {
       try {
-        await axios.put(`http://localhost:8089/api/notifications/read/${tb.maThongBao}`);
+        await notificationApi.markAsRead(tb.maThongBao);
         // Giảm số trên chấm đỏ đi 1 (không để âm)
         setUnreadCount(prev => Math.max(0, prev - 1));
         // Đổi trạng thái trong mảng thành đã đọc (daDoc: true)

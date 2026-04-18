@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { Loader2, AlertTriangle } from 'lucide-react';
-import { orderApi } from '../../api/orderAPI';
-import { doanhthuApi } from '../../api/doanhthuAPI';
-import { tableApi } from '../../api/tableAPI';
+import { orderApi, doanhthuApi, tableApi } from '../../api/APIGateway';
 import ReceiptModal from '../../components/Common/ReceiptModal';
 import './PaymentPage.css';
 

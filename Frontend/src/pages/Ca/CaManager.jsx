@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { caApi, hoaDonApi, tableApi } from '../../api/APIGateway';
 import { 
   Wallet, 
   Clock, 
@@ -17,10 +17,6 @@ import DoanhThuManager from './DoanhThuManager.jsx';
 import CaDetail from './CaDetail.jsx';
 import HoaDonDetail from '../../components/HoaDon/HoaDonDetail.jsx';
 import './CaManager.css';
-
-const API_URL = 'http://localhost:8084/api/ca';
-const API_URL_HOADON = 'http://localhost:8081/api/hoadon';
-const API_URL_BAN = 'http://localhost:8083/api/ban';
 
 const CaManager = () => {
     const [activeCa, setActiveCa] = useState(null);
@@ -40,7 +36,7 @@ const CaManager = () => {
 
     const fetchOpenCaState = async () => {
         try {
-            const response = await axios.get(`${API_URL}/kiem-tra-ca-mo`);
+            const response = await caApi.checkOpenCa();
             const data = response.data || {};
             setActiveCa(data.ca || null);
             setOpenShiftDialog(data.batBuocMoCa === true);
@@ -51,9 +47,9 @@ const CaManager = () => {
 
     const fetchBanMap = async () => {
         try {
-            const response = await axios.get(API_URL_BAN);
+            const response = await tableApi.getTables();
             const map = {};
-            (response.data || []).filter((ban) => String(ban?.trangThaiBan || '').trim() !== 'Ẩn').forEach((ban) => {
+            (response.data || []).forEach((ban) => {
                 if (ban.maBan) map[ban.maBan] = ban.tenBan || ban.maBan;
             });
             setBanMap(map);
@@ -62,7 +58,7 @@ const CaManager = () => {
 
     const fetchHoaDons = async () => {
         try {
-            const response = await axios.get(API_URL_HOADON);
+            const response = await hoaDonApi.getAll();
             setHoaDons(response.data || []);
         } catch (e) { console.error(e); }
     };
@@ -74,9 +70,7 @@ const CaManager = () => {
             return;
         }
         try {
-            const response = await axios.post(`${API_URL}/mo-ca`, null, {
-                params: { soTienKet: amount }
-            });
+            const response = await caApi.openCa(amount);
             alert(`Mở ca thành công!`);
             setOpenShiftDialog(false);
             setInitialCash('');
@@ -90,7 +84,7 @@ const CaManager = () => {
         if (!activeCa?.maCa) return;
         if (!window.confirm("Hải có chắc muốn kết thúc ca làm việc này không?")) return;
         try {
-            await axios.put(`${API_URL}/${activeCa.maCa}/dong-ca`);
+            await caApi.closeCa(activeCa.maCa);
             fetchOpenCaState();
             alert(`Đã đóng ca thành công!`);
         } catch (e) { alert('Lỗi khi đóng ca'); }

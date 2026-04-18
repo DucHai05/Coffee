@@ -15,9 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class LuongThuongService {
@@ -58,7 +56,7 @@ public class LuongThuongService {
 
     @Transactional
     public void tinhLuongDongLoat(Integer thang, Integer nam, String authorizationHeader) {
-        String url = "http://localhost:8081/api/nhan-vien";
+        String url = "http://service-user:8086/api/nhan-vien";
         HttpHeaders headers = new HttpHeaders();
         headers.set(HttpHeaders.AUTHORIZATION, authorizationHeader);
 

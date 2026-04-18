@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
-import axios from "axios";
+// IMPORT FILE API TỔNG HỢP
+import { employeeApi } from '../../api/APIGateway';
 import "./employee.css";
 
 function EmployeeManagement() {
@@ -16,23 +17,20 @@ function EmployeeManagement() {
     });
 
     const [selectedRowId, setSelectedRowId] = useState(null);
-    const token = localStorage.getItem("token");
 
-    // 1. Sửa API lấy toàn bộ nhân viên (Bỏ maThuongHieu)
+    // 1. Tải danh sách nhân viên - PHẢI CÓ TOKEN
     const loadEmployees = useCallback(async () => {
-        if (!token) return;
         try {
-            const res = await axios.get(
-                `http://localhost:8086/api/nhan-vien`, // Gọi cổng 8081
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const token = localStorage.getItem("token"); // Lấy "giấy thông hành"
+            const res = await employeeApi.getAll(token); // Truyền token vào đây
             setEmployees(res.data);
         } catch (error) {
-            console.error("Lỗi tải dữ liệu:", error);
+            console.error("Lỗi tải dữ liệu qua Gateway:", error);
+            if (error.response?.status === 401) alert("Phiên đăng nhập hết hạn!");
         } finally {
             setLoading(false);
         }
-    }, [token]);
+    }, []);
 
     useEffect(() => { loadEmployees(); }, [loadEmployees]);
 
@@ -53,43 +51,55 @@ function EmployeeManagement() {
         setSelectedRowId(null);
     };
 
-    // 2. Sửa API Cập nhật
+    // 2. Cập nhật nhân viên - CẦN TOKEN
     const handleUpdate = async () => {
         if (!formData.maNhanVien) return alert("Vui lòng chọn nhân viên từ bảng!");
         try {
-            await axios.put(`http://localhost:8086/api/nhan-vien/${formData.maNhanVien}`, formData,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
+            const token = localStorage.getItem("token");
+            await employeeApi.update(formData.maNhanVien, formData, token);
             alert("Cập nhật thành công!");
             loadEmployees();
             handleReset();
-        } catch { alert("Lỗi cập nhật!"); }
+        } catch { alert("Lỗi cập nhật! Kiểm tra quyền ADMIN."); }
     };
 
-    // 3. Sửa API Thêm mới (Bỏ object thuongHieu)
+    // 3. Thêm mới nhân viên - CẦN TOKEN
     const handleAdd = async () => {
         if (!formData.tenNhanVien || !formData.tenDangNhap) {
             return alert("Vui lòng nhập đầy đủ Tên nhân viên và Email!");
         }
-
         try {
-            // Không gửi kèm thuongHieu nữa
-            await axios.post(
-                `http://localhost:8086/api/nhan-vien`,
-                formData,
-                { headers: { Authorization: `Bearer ${token}` } }
-            );
-
+            const token = localStorage.getItem("token");
+            await employeeApi.create(formData, token);
             alert("Thêm nhân viên thành công!");
             loadEmployees();
             handleReset();
         } catch (error) {
             console.error("Lỗi khi thêm:", error);
-            alert("Lỗi: " + (error.response?.data || "Không thể thêm nhân viên."));
+            alert("Lỗi: " + (error.response?.data || "Không có quyền thực hiện."));
         }
     };
 
-    if (loading) return <div className="loading">Đang tải...</div>;
+    // 4. Xóa nhân viên - CẦN TOKEN
+    const handleDelete = async () => {
+        if (!selectedRowId) return alert("Vui lòng chọn nhân viên cần xóa!");
+
+        const confirmDelete = window.confirm(`Xác nhận xóa nhân viên [${formData.tenNhanVien}]?`);
+        if (confirmDelete) {
+            try {
+                const token = localStorage.getItem("token");
+                await employeeApi.delete(selectedRowId, token);
+                alert("Xóa thành công!");
+                loadEmployees();
+                handleReset();
+            } catch (error) {
+                console.error("Lỗi khi xóa:", error);
+                alert("Lỗi: Không thể xóa qua Gateway.");
+            }
+        }
+    };
+
+    if (loading) return <div className="loading">Đang tải Lado Coffee...</div>;
 
     return (
         <div className="admin-container">
@@ -139,7 +149,7 @@ function EmployeeManagement() {
                 <div className="button-group">
                     <button className="btn-add" onClick={handleAdd}>Thêm</button>
                     <button className="btn-edit" onClick={handleUpdate}>Sửa</button>
-                    <button className="btn-delete" >Xóa</button>
+                    <button className="btn-delete" onClick={handleDelete} >Xóa</button>
                     <button className="btn-reset" onClick={handleReset}>Làm mới</button>
                 </div>
             </div>

@@ -3,7 +3,6 @@ package com.example.servicedoanhthu.repository;
 import com.example.servicedoanhthu.entity.DoanhThu;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface DoanhThuRepository extends JpaRepository<DoanhThu, String> {

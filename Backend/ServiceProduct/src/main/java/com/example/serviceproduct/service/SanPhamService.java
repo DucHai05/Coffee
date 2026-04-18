@@ -2,7 +2,9 @@ package com.example.serviceproduct.service;
 
 import com.example.serviceproduct.dto.response.SanPhamResponse;
 import com.example.serviceproduct.entity.CongThuc;
+import com.example.serviceproduct.entity.LoaiSanPham;
 import com.example.serviceproduct.entity.SanPham;
+import com.example.serviceproduct.repository.LoaiSanPhamRepository;
 import com.example.serviceproduct.repository.SanPhamRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +17,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SanPhamService {
     private final SanPhamRepository sanPhamRepository;
-
+    private final LoaiSanPhamRepository loaiSanPhamRepository;
     public List<SanPhamResponse> getAllSanPham() {
     List<SanPham> danhSach = sanPhamRepository.findAll();
 
@@ -38,16 +40,24 @@ public class SanPhamService {
 
     @Transactional
     public SanPham saveSanPham(SanPham sanPham) {
-        
-        // THÊM ĐOẠN NÀY VÀO: 
-        // Lặp qua danh sách công thức và báo cho Hibernate biết "Công thức này là của Sản phẩm này"
+
+        if (sanPham.getLoaiSanPham() != null && sanPham.getLoaiSanPham().getMaLoaiSanPham() != null) {
+            String maLoai = sanPham.getLoaiSanPham().getMaLoaiSanPham();
+            // Tìm Loại SP thật trong DB
+            LoaiSanPham loaiCoSan = loaiSanPhamRepository.findById(maLoai)
+                    .orElseThrow(() -> new RuntimeException("Lỗi: Không tìm thấy Loại Sản Phẩm có mã " + maLoai));
+            // Gắn cục Object thật vào
+            sanPham.setLoaiSanPham(loaiCoSan);
+        }
+
+        // --- 2. XỬ LÝ CÔNG THỨC (Đoạn code siêu chuẩn của bạn) ---
         if (sanPham.getDanhSachCongThuc() != null) {
             for (CongThuc ct : sanPham.getDanhSachCongThuc()) {
-                ct.setSanPham(sanPham); 
+                ct.setSanPham(sanPham);
             }
         }
-        
-        // Đoạn lưu giữ nguyên
+
+        // --- 3. LƯU XUỐNG DATABASE ---
         return sanPhamRepository.save(sanPham);
     }
 

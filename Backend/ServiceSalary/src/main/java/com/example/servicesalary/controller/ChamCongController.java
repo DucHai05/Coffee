@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/cham-cong")
+@RequestMapping("/cham-cong")
 @RequiredArgsConstructor
 public class ChamCongController {
 

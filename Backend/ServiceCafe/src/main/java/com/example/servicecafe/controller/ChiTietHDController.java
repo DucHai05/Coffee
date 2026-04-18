@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/chitiethd")
+@RequestMapping("/chitiethd")
 @CrossOrigin(origins = "*")
 public class ChiTietHDController {
     @Autowired

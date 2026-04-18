@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import axios from 'axios';
+import { doanhthuApi, caApi } from '../../api/APIGateway';
 import { 
   BarChart3, 
   Calendar, 
@@ -17,9 +17,6 @@ import {
 import DoanhThuDetail from './DoanhThuDetail';
 import './DoanhThuList.css';
 
-const API_URL_DOANHTHU = 'http://localhost:8084/api/doanhthu';
-const API_URL_CA = 'http://localhost:8084/api/ca';
-
 const DoanhThuManager = () => {
     const [doanhThus, setDoanhThus] = useState([]);
     const [selectedDoanhThu, setSelectedDoanhThu] = useState(null);
@@ -36,8 +33,8 @@ const DoanhThuManager = () => {
             setLoading(true);
             setError(null);
             const [doanhThuResponse, caResponse] = await Promise.all([
-                axios.get(API_URL_DOANHTHU),
-                axios.get(API_URL_CA)
+                doanhthuApi.getAll(),
+                caApi.getAll()
             ]);
 
             const doanhThuData = doanhThuResponse.data || [];

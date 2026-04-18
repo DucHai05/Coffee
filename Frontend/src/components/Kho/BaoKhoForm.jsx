@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { employeeApi, notificationApi } from '../../api/APIGateway';
 import './baoKhoForm.css';
 
 const BaoKhoForm = ({ nguyenLieus, onClose }) => {
@@ -47,7 +47,7 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
         if (baoKhoItems.length === 0) return;
 
         try {
-            const responseUser = await axios.get('http://localhost:8086/api/nhan-vien');
+            const responseUser = await employeeApi.getAll();
             const danhSachQuanLy = responseUser.data
                 .map(nv => nv.maNhanVien)
                 .filter(ma => ma.startsWith('QL'));
@@ -58,11 +58,10 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
             }
 
             const noiDungGop = baoKhoItems.map((item) => `- ${item.tenNguyenLieu}: ${item.noiDung}`).join('\n');
-            const NOTIFICATION_API_URL = 'http://localhost:8089/api/notifications/create';
             const promises = [];
 
             danhSachQuanLy.forEach(maQL => {
-                promises.push(axios.post(NOTIFICATION_API_URL, {
+                promises.push(notificationApi.create({
                     maNhanVien: maQL,
                     tieuDe: `Báo cáo kho (${baoKhoItems.length} nguyên liệu)`,
                     noiDung: noiDungGop,
@@ -78,7 +77,7 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
             onClose(); // Đóng form báo kho
         } catch (error) {
             console.error("Lỗi:", error);
-            alert("Đã xảy ra lỗi kết nối! Hãy chắc chắn ServiceUser (8086) và Notification (8089) đang chạy.");
+            alert("Đã xảy ra lỗi kết nối! Hãy chắc chắn API Gateway (8080) và các service đang chạy.");
         }
     };
 

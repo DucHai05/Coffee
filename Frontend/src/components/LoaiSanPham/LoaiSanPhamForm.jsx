@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { loaiSanPhamApi } from '../../api/APIGateway';
 import './loaiSanPhamForm.css';
 
 const LoaiSanPhamForm = ({ isEdit, initialData, onClose, onRefresh }) => {
@@ -13,9 +13,9 @@ const LoaiSanPhamForm = ({ isEdit, initialData, onClose, onRefresh }) => {
         e.preventDefault();
         try {
             if (isEdit) {
-                await axios.put(`http://localhost:8087/api/v1/loai-san-pham/${formData.maLoaiSanPham}`, formData);
+                await loaiSanPhamApi.update(formData.maLoaiSanPham, formData);
             } else {
-                await axios.post('http://localhost:8087/api/v1/loai-san-pham', formData);
+                await loaiSanPhamApi.create(formData);
             }
             onRefresh(); // Gọi hàm load lại bảng của component cha
             onClose();   // Đóng Modal

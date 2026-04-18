@@ -2,7 +2,6 @@ package com.example.servicesalary.controller;
 
 import lombok.RequiredArgsConstructor;
 import com.example.servicesalary.entity.LuongThuong;
-import com.example.servicesalary.service.JwtService;
 import com.example.servicesalary.service.LuongThuongService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/salary")
+@RequestMapping("/salary")
 @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 @RequiredArgsConstructor
 public class LuongThuongController {

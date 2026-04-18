@@ -1,7 +1,6 @@
 package com.example.servicepromotion.service;
 
 
-import com.example.servicepromotion.entity.KhuyenMai;
 import com.example.servicepromotion.entity.KhuyenMaiConfig;
 import com.example.servicepromotion.repository.KhuyenMaiConfigRepository;
 import org.springframework.beans.factory.annotation.Autowired;

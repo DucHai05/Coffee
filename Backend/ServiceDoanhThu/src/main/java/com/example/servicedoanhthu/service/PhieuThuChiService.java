@@ -69,11 +69,6 @@ public class PhieuThuChiService {
             throw new RuntimeException("Loai phieu khong hop le. Chi nhan 'Thu' hoac 'Chi'");
         }
 
-        // 4. Quan trọng: Cập nhật lại Tổng doanh thu sau khi thay đổi Thu/Chi
-        // Công thức: Tổng = (Tiền mặt + Chuyển khoản + Thu) - Chi
-        double tongMoi = (handleNull(doanhThu.getTienMat()) + handleNull(doanhThu.getTienCK()) + handleNull(doanhThu.getTienThu()))
-                - handleNull(doanhThu.getTienChi());
-
         // 5. Lưu đồng bộ cả 3 bảng
         PhieuThuChi savedPhieuThuChi = phieuThuChiRepository.save(phieuThuChi);
         doanhThuRepository.save(doanhThu);

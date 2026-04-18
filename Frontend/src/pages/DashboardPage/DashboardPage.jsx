@@ -10,8 +10,7 @@ import promo1 from '../../assets/promo.jpg';
 import promo2 from '../../assets/promo2.jpg';
 import promo3 from '../../assets/promo3.jpg';
 
-import { promoApi } from '../../api/promotionAPI';
-import { doanhthuApi } from '../../api/doanhthuAPI';
+import { promoApi, doanhthuApi } from '../../api/APIGateway';
 
 const Dashboard = () => {
     const [currentPromos, setCurrentPromos] = useState([]);

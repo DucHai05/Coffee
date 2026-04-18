@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+// IMPORT AUTH_API TỪ FILE TỔNG HỢP CỦA BẠN
+import { authApi } from '../../api/APIGateway'; 
 import "./forgot.css";
 
 export default function ForgotPassword() {
@@ -11,46 +13,40 @@ export default function ForgotPassword() {
     const [confirm, setConfirm] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
+    // BƯỚC 1: GỬI OTP
     const handleSendOTP = async () => {
         try {
-            const res = await fetch("http://localhost:8086/api/auth/forgot", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email })
-            });
-            if (res.ok) setStep(2);
-            else alert("Email không tồn tại!");
-        } catch { alert("Lỗi kết nối server!"); }
+            const res = await authApi.forgotPassword(email);
+            // Với Axios, nếu thành công (status 2xx) nó sẽ chạy tiếp
+            setStep(2);
+        } catch (error) {
+            alert(error.response?.data || "Email không tồn tại hoặc lỗi server!");
+        }
     };
 
+    // BƯỚC 2: XÁC THỰC OTP
     const handleVerifyOTP = async () => {
         try {
-            const res = await fetch("http://localhost:8086/api/auth/verify-otp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, otp: parseInt(otp) })
-            });
-            if (res.ok) setStep(3);
-            else alert("Mã OTP không chính xác!");
-        } catch { alert("Lỗi kết nối server!"); }
+            const res = await authApi.verifyOTP(email, otp);
+            setStep(3);
+        } catch (error) {
+            alert(error.response?.data || "Mã OTP không chính xác!");
+        }
     };
 
+    // BƯỚC 3: ĐẶT LẠI MẬT KHẨU
     const handleResetPassword = async () => {
         if (password !== confirm) {
             alert("Mật khẩu xác nhận không khớp!");
             return;
         }
         try {
-            const res = await fetch("http://localhost:8086/api/auth/reset", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, otp: parseInt(otp), newPassword: password })
-            });
-            if (res.ok) {
-                alert("Đổi mật khẩu thành công!");
-                navigate("/");
-            } else alert("Lỗi reset mật khẩu!");
-        } catch { alert("Lỗi hệ thống!"); }
+            const res = await authApi.resetPassword(email, otp, password);
+            alert("Đổi mật khẩu thành công!");
+            navigate("/");
+        } catch (error) {
+            alert(error.response?.data || "Lỗi reset mật khẩu!");
+        }
     };
 
     return (

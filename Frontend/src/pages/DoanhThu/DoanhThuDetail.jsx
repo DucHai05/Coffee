@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
-import axios from 'axios';
+import { hoaDonApi, tableApi, doanhthuApi } from '../../api/APIGateway';
 import { 
   ChevronLeft, 
   Info, 
@@ -18,10 +18,6 @@ import {
 import HoaDonDetail from '../../components/HoaDon/HoaDonDetail.jsx';
 import './DoanhThuDetail.css';
 
-const API_URL_HOADON = 'http://localhost:8081/api/hoadon';
-const API_URL_BAN = 'http://localhost:8083/api/ban';
-const API_URL_DOANHTHU = 'http://localhost:8084/api/doanhthu';
-
 const DoanhThuDetail = ({ doanhThu, onBack }) => {
     const [hoaDons, setHoaDons] = useState([]);
     const [banMap, setBanMap] = useState({});
@@ -36,17 +32,15 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
         try {
             setLoading(true);
             const [hoaDonRes, banRes] = await Promise.all([
-                axios.get(`${API_URL_HOADON}/ca/${doanhThu.maCa}`),
-                axios.get(API_URL_BAN)
+                hoaDonApi.getByCa(doanhThu.maCa),
+                tableApi.getTables()
             ]);
 
             const map = {};
             if (Array.isArray(banRes.data)) {
-                banRes.data
-                    .filter((ban) => String(ban?.trangThaiBan || '').trim() !== 'Ẩn')
-                    .forEach((ban) => {
+                banRes.data.forEach((ban) => {
                     if (ban.maBan) map[ban.maBan] = ban.tenBan || ban.maBan;
-                    });
+                });
             }
             setBanMap(map);
             setHoaDons(hoaDonRes.data || []);

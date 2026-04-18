@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../api/axiosConfig'; 
-import apiStore from '../../api/axiosStore'; 
+import { productApi, khoApi } from '../../api/APIGateway';
 import SanPhamForm from '../../components/SanPham/SanPhamForm';
 import './sanPhamcss.css';
 
@@ -29,9 +28,9 @@ const SanPhamList = () => {
     const loadData = async () => {
         try {
             const [spRes, nlRes, lspRes] = await Promise.all([
-                api.get('/san-pham'),
-                apiStore.get('/nguyen-lieu'),
-                api.get('/loai-san-pham') 
+                productApi.getProducts(),
+                khoApi.getAll(),
+                productApi.getLoaiSP() 
             ]);
             setSanPhams(spRes.data);
             setKhoNguyenLieu(nlRes.data);
@@ -46,7 +45,7 @@ const SanPhamList = () => {
     // ==========================================
     const handleDelete = async (maSanPham) => {
         if (window.confirm("Xóa sản phẩm này sẽ xóa luôn công thức của nó. Tiếp tục?")) {
-            await api.delete(`/san-pham/${maSanPham}`);
+            await productApi.delete(maSanPham);
             loadData();
         }
     };

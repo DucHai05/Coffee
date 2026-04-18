@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import apiStore from '../../api/axiosStore';
+import { khoApi } from '../../api/APIGateway';
 import './nguyenLieuForm.css';
 const NguyenLieuForm = ({ isEditing, initialData, onClose, onRefresh }) => {
     // Quản lý state của riêng form này
@@ -14,7 +14,7 @@ const NguyenLieuForm = ({ isEditing, initialData, onClose, onRefresh }) => {
     const handleSave = async (e) => {
         e.preventDefault();
         try {
-            await apiStore.post('/nguyen-lieu', formData);
+            await khoApi.create(formData);
             alert("Lưu thông tin thành công!");
             onRefresh(); // Gọi hàm load lại bảng của component cha
             onClose();   // Đóng form

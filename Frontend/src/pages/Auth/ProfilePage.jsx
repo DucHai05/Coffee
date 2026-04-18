@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { authApi, salaryApi } from "../../api/APIGateway";
 import "./profile.css";
 
 const Profile = () => {
@@ -29,9 +29,7 @@ const Profile = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
-                const res = await axios.get("http://localhost:8086/api/nhan-vien/me", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await authApi.getProfile(token);
                 setUser(res.data);
             } catch (err) {
                 console.error(err);
@@ -47,14 +45,7 @@ const Profile = () => {
                 if (!user?.maNhanVien) return;
 
                 const [year, month] = selectedMonth.split("-");
-                const res = await axios.get("http://localhost:8085/api/cham-cong/history", {
-                    params: {
-                        maNV: user.maNhanVien,
-                        month: parseInt(month),
-                        year: parseInt(year)
-                    },
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                const res = await salaryApi.getHistory(user.maNhanVien, parseInt(month), parseInt(year), token);
 
                 setWorkHistory(res.data || []);
             } catch (err) {
@@ -75,16 +66,10 @@ const Profile = () => {
 
         setPwdLoading(true);
         try {
-            await axios.post(
-                "http://localhost:8086/api/auth/change-password",
-                {
-                    oldPassword: pwdData.oldPassword,
-                    newPassword: pwdData.newPassword
-                },
-                {
-                    headers: { Authorization: `Bearer ${token}` }
-                }
-            );
+            await authApi.changePassword({
+                oldPassword: pwdData.oldPassword,
+                newPassword: pwdData.newPassword
+            }, token);
 
             alert("Đổi mật khẩu thành công!");
             setIsModalOpen(false);

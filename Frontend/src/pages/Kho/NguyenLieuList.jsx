@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import apiStore from '../../api/axiosStore';
+import { khoApi } from '../../api/APIGateway';
 import NguyenLieuForm from '../../components/Kho/NguyenLieuForm';
 import BaoKhoForm from '../../components/Kho/BaoKhoForm';
 import './nguyenLieuList.css';
@@ -18,7 +18,7 @@ const NguyenLieuList = () => {
 
     const loadData = async () => {
         try {
-            const response = await apiStore.get('/nguyen-lieu');
+            const response = await khoApi.getAll();
             setNguyenLieus(response.data);
         } catch (error) {
             console.error("Lỗi lấy dữ liệu Kho:", error);
@@ -28,7 +28,7 @@ const NguyenLieuList = () => {
     const handleDelete = async (id) => {
         if (window.confirm("Xóa nguyên liệu này khỏi kho?")) {
             try {
-                await apiStore.delete(`/nguyen-lieu/${id}`);
+                await khoApi.delete(id);
                 loadData();
             } catch (error) {
                 alert("Lỗi khi xóa!");

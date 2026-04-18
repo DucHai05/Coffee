@@ -69,6 +69,7 @@ public class AuthService {
         TaiKhoan tk = taiKhoanRepository.findByTenDangNhap(username)
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
 
+        System.out.println("Mat khau thuc te nguoi dung nhap la: " + password);
         if (!passwordEncoder.matches(password, tk.getMatKhau())) {
             throw new RuntimeException("Sai mật khẩu!");
         }

@@ -1,10 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { CircleCheckBig, QrCode, Search, ShoppingCart, X } from 'lucide-react';
-import { orderApi } from '../../api/orderAPI';
-import { promoApi } from '../../api/promotionAPI';
-import { tableApi } from '../../api/tableAPI';
-import { doanhthuApi } from '../../api/doanhthuAPI';
+import { orderApi, promoApi, tableApi, doanhthuApi } from '../../api/APIGateway';
 import * as CartHelpers from '../../utils/cartHelpers';
 import CategoryTab from '../../components/Common/CategoryTab';
 import NoteModal from '../../components/Common/NoteModal';

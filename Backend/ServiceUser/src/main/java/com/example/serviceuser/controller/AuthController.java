@@ -4,25 +4,17 @@
     import com.example.serviceuser.dto.RegisterRequest;
     import com.example.serviceuser.service.AuthService;
     import lombok.RequiredArgsConstructor;
-    import org.springframework.security.core.Authentication;
-    import org.springframework.beans.factory.annotation.Autowired;
-    import org.springframework.http.HttpStatus;
-    import org.springframework.http.ResponseEntity;
-    import org.springframework.security.authentication.AuthenticationManager;
-    import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-    import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-    import java.util.Map;
-
+import java.util.Map;
     @RestController
-    @RequestMapping("/api/auth")
+    @RequestMapping("/auth")
     @RequiredArgsConstructor
     public class AuthController {
 
         private final AuthService authService;
 
-        @Autowired
-        private AuthenticationManager authenticationManager;
         // ĐĂNG KÝ (Tạo Thương hiệu + Quản lý)
         @PostMapping("/register")
         public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
@@ -43,6 +35,7 @@
                         request.getTenDangNhap(),
                         request.getMatKhau()
                 );
+
                 return ResponseEntity.ok(result);
             } catch (RuntimeException e) {
                 return ResponseEntity.status(401).body(Map.of("error", e.getMessage()));

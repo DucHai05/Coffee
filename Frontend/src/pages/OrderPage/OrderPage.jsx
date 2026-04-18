@@ -1,10 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, Info, MoreVertical, X } from 'lucide-react'; // Icon cho chuyên nghiệp
-import { orderApi } from '../../api/orderAPI';
-import { promoApi } from '../../api/promotionAPI';
-import { tableApi } from '../../api/tableAPI';
-import { doanhthuApi } from '../../api/doanhthuAPI'; 
+import { Search, ShoppingCart, Info, MoreVertical, X } from 'lucide-react';
+import { orderApi, promoApi, tableApi, doanhthuApi, productApi } from '../../api/APIGateway'; 
 import PhanLoaiCard from '../../components/Common/PhanLoaiCard'; 
 import CategoryTab from '../../components/Common/CategoryTab';
 import KitchenSlipModal from '../../components/Common/KitchenSlipModal';
@@ -91,7 +88,7 @@ const OrderPage = () => {
                     promoApi.getActivePromos(),
                     orderApi.getProducts(),
                     tableApi.getTableName(maBan),
-                    orderApi.getLoaiSP()
+                    productApi.getLoaiSP()
 
                 ]);
                 setMaCaOpen(caRes.data.maCa || caRes.data);
@@ -277,7 +274,7 @@ const OrderPage = () => {
                                 <PhanLoaiCard 
                                     key={p.maSanPham}
                                     title={p.tenSanPham}
-                                    subtitle={p.giaBan?.toLocaleString('vi-VN')} đ
+                                    subtitle={p.giaBan?.toLocaleString('vi-VN') || p.donGia?.toLocaleString('vi-VN')} đ
                                     image={p.duongDanHinh}
                                     onClick={() => addToCart(p)}
                                     type="product"

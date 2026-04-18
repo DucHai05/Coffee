@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { phieuThuChiApi } from '../../api/APIGateway';
 import { 
   PlusCircle, 
   TrendingUp, 
@@ -11,8 +11,6 @@ import {
   AlertCircle
 } from 'lucide-react';
 import './DoanhThuManager.css';
-
-const API_URL_PHIEU = 'http://localhost:8084/api/phieuthuchi';
 
 const DoanhThuManager = ({ ca, onRefreshCa }) => {
     const [phieuThu, setPhieuThu] = useState([]);
@@ -28,7 +26,7 @@ const DoanhThuManager = ({ ca, onRefreshCa }) => {
 
     const fetchPhieu = async () => {
         try {
-            const response = await axios.get(`${API_URL_PHIEU}/ca/${ca.maCa}`);
+            const response = await phieuThuChiApi.getByCa(ca.maCa);
             const all = response.data || [];
             setPhieuThu(all.filter((item) => item.loaiPhieu === 'Thu'));
             setPhieuChi(all.filter((item) => item.loaiPhieu === 'Chi'));
@@ -58,7 +56,7 @@ const DoanhThuManager = ({ ca, onRefreshCa }) => {
                 loaiPhieu: modalType === 'thu' ? 'Thu' : 'Chi'
             };
 
-            await axios.post(API_URL_PHIEU, payload);
+            await phieuThuChiApi.create(payload);
             await fetchPhieu();
             if (onRefreshCa) await onRefreshCa();
             setModalOpen(false);

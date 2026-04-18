@@ -1,6 +1,6 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '3.4.1' // Lùi về bản ổn định này
+    id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version '1.1.7'
 }
 
@@ -21,7 +21,7 @@ dependencies {
     // Web & WebSocket
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-websocket'
-
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     // Data & Database
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'com.microsoft.sqlserver:mssql-jdbc'
@@ -39,6 +39,8 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2024.0.0"
-    }
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.1"    }
+}
+jar {
+    enabled = false
 }

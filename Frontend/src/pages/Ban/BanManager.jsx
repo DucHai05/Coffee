@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { tableApi } from '../../api/APIGateway';
 import { 
   PlusCircle, 
   Pencil, 
@@ -11,8 +11,6 @@ import {
   RefreshCw
 } from 'lucide-react';
 import './BanManager.css';
-
-const API_URL = 'http://localhost:8083/api/ban';
 
 const BanManager = ({ khuVuc }) => {
     const [bans, setBans] = useState([]);
@@ -45,7 +43,7 @@ const BanManager = ({ khuVuc }) => {
         if (!khuVuc || !khuVuc.maKhuVuc) return;
         setLoading(true);
         try {
-            const response = await axios.get(`${API_URL}/khuvuc/${khuVuc.maKhuVuc}`);
+            const response = await tableApi.getBanByKhuVuc(khuVuc.maKhuVuc);
             setBans(response.data);
         } catch (error) {
             showMessage("Không thể tải danh sách bàn", true);
@@ -70,10 +68,10 @@ const BanManager = ({ khuVuc }) => {
 
         try {
             if (isEditing) {
-                await axios.put(`${API_URL}/${formData.maBan}`, payload);
+                await tableApi.updateBan(formData.maBan, payload);
                 showMessage("Cập nhật bàn thành công!");
             } else {
-                await axios.post(API_URL, payload);
+                await tableApi.createBan(payload);
                 showMessage("Thêm bàn mới thành công!");
             }
             fetchBans();
@@ -87,7 +85,7 @@ const BanManager = ({ khuVuc }) => {
     const handleDelete = async (id) => {
         if (window.confirm(`Xác nhận xóa bàn ${id}?`)) {
             try {
-                await axios.delete(`${API_URL}/${id}`);
+                await tableApi.deleteBan(id);
                 fetchBans();
                 showMessage("Xoá bàn thành công!");
             } catch (error) {

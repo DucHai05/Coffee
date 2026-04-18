@@ -1,127 +1,123 @@
-    import React, { useState, useEffect } from 'react';
-    import axios from 'axios';
-    import { Plus, Edit3, Trash2, FolderTree, AlertCircle } from 'lucide-react';
-    import LoaiSanPhamForm from '../../components/LoaiSanPham/LoaiSanPhamForm';
-    import './loaiSanPham.css';
+import React, { useState, useEffect } from 'react';
+import { loaiSanPhamApi } from '../../api/APIGateway';
+import { Plus, Edit3, Trash2, FolderTree, AlertCircle } from 'lucide-react';
+import LoaiSanPhamForm from '../../components/LoaiSanPham/LoaiSanPhamForm';
+import './loaiSanPham.css';
 
-    export default function LoaiSanPhamList() {
-        const [danhSachLoai, setDanhSachLoai] = useState([]);
-        const [showModal, setShowModal] = useState(false);
-        const [isEdit, setIsEdit] = useState(false);
-        const [editData, setEditData] = useState(null);
-        const [loading, setLoading] = useState(true);
+export default function LoaiSanPhamList() {
+    const [danhSachLoai, setDanhSachLoai] = useState([]);
+    const [showModal, setShowModal] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editData, setEditData] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-        // Dùng chung một base URL cho đỡ nhầm cổng
-        const API_BASE = 'http://localhost:8087/api/v1/loai-san-pham';
+    useEffect(() => { 
+        fetchData(); 
+    }, []);
 
-        useEffect(() => { 
-            fetchData(); 
-        }, []);
+    const fetchData = async () => {
+        try {
+            setLoading(true);
+            const res = await loaiSanPhamApi.getAll();
+            setDanhSachLoai(res.data);
+        } catch (error) {
+            console.error("Lỗi lấy dữ liệu:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-        const fetchData = async () => {
+    const handleOpenModal = (loai = null) => {
+        if (loai) {
+            setIsEdit(true);
+            setEditData(loai);
+        } else {
+            setIsEdit(false);
+            setEditData(null);
+        }
+        setShowModal(true);
+    };
+
+    const handleDelete = async (id, ten) => {
+        if (window.confirm(`CẢNH BÁO: Xóa loại "${ten}" sẽ xóa TẤT CẢ sản phẩm thuộc loại này. Bạn có chắc chắn?`)) {
             try {
-                setLoading(true);
-                const res = await axios.get(API_BASE);
-                setDanhSachLoai(res.data);
+                await loaiSanPhamApi.delete(id);
+                fetchData();
             } catch (error) {
-                console.error("Lỗi lấy dữ liệu:", error);
-            } finally {
-                setLoading(false);
+                alert("Không thể xóa! Có thể loại này đang có sản phẩm liên kết.");
             }
-        };
+        }
+    };
 
-        const handleOpenModal = (loai = null) => {
-            if (loai) {
-                setIsEdit(true);
-                setEditData(loai);
-            } else {
-                setIsEdit(false);
-                setEditData(null);
-            }
-            setShowModal(true);
-        };
-
-        const handleDelete = async (id, ten) => {
-            if (window.confirm(`CẢNH BÁO: Xóa loại "${ten}" sẽ xóa TẤT CẢ sản phẩm thuộc loại này. Bạn có chắc chắn?`)) {
-                try {
-                    // ĐÃ FIX: Chuyển từ 8080 sang 8087 cho đồng bộ
-                    await axios.delete(`${API_BASE}/${id}`);
-                    fetchData();
-                } catch (error) {
-                    alert("Không thể xóa! Có thể loại này đang có sản phẩm liên kết.");
-                }
-            }
-        };
-
-        return (
-            <div className="loaisp-container">
-                <header className="loaisp-header">
-                    <div className="header-left">
-                        <div className="icon-title bg-indigo">
-                            <FolderTree size={24} color="white" />
-                        </div>
-                        <div>
-                            <h2 className="loaisp-title">Phân loại sản phẩm</h2>
-                            <p className="loaisp-subtitle">Quản lý các nhóm đồ uống và món ăn của Lado</p>
-                        </div>
+    return (
+        <div className="loaisp-container">
+            <header className="loaisp-header">
+                <div className="header-left">
+                    <div className="icon-title bg-indigo">
+                        <FolderTree size={24} color="white" />
                     </div>
-                    <button className="btn-add-new" onClick={() => handleOpenModal()}>
-                        <Plus size={18} /> Thêm Loại Mới
-                    </button>
-                </header>
+                    <div>
+                        <h2 className="loaisp-title">Phân loại sản phẩm</h2>
+                        <p className="loaisp-subtitle">Quản lý các nhóm đồ uống và món ăn của Lado</p>
+                    </div>
+                </div>
+                <button className="btn-add-new" onClick={() => handleOpenModal()}>
+                    <Plus size={18} /> Thêm Loại Mới
+                </button>
+            </header>
 
-                <div className="loaisp-card shadow-sm">
-                    <table className="loaisp-table">
-                        <thead>
+            <div className="loaisp-card shadow-sm">
+                <table className="loaisp-table">
+                    <thead>
+                        <tr>
+                            <th style={{ width: '20%' }}>Mã Loại</th>
+                            <th style={{ width: '55%', textAlign: 'left' }}>Tên Loại Sản Phẩm</th>
+                            <th style={{ width: '25%' }}>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {loading ? (
+                            <tr><td colSpan="3" className="loading-text">Đang tải dữ liệu...</td></tr>
+                        ) : danhSachLoai.length === 0 ? (
                             <tr>
-                                <th style={{ width: '20%' }}>Mã Loại</th>
-                                <th style={{ width: '55%', textAlign: 'left' }}>Tên Loại Sản Phẩm</th>
-                                <th style={{ width: '25%' }}>Thao tác</th>
+                                <td colSpan="3" className="empty-state">
+                                    <AlertCircle size={40} />
+                                    <p>Chưa có loại sản phẩm nào.</p>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            {loading ? (
-                                <tr><td colSpan="3" className="loading-text">Đang tải dữ liệu...</td></tr>
-                            ) : danhSachLoai.length === 0 ? (
-                                <tr>
-                                    <td colSpan="3" className="empty-state">
-                                        <AlertCircle size={40} />
-                                        <p>Chưa có loại sản phẩm nào.</p>
+                        ) : (
+                            danhSachLoai.map((loai) => (
+                                <tr key={loai.maLoaiSanPham}>
+                                    <td className="ma-loai">{loai.maLoaiSanPham}</td>
+                                    <td className="ten-loai text-left">
+                                        <span className="bullet-point"></span>
+                                        {loai.tenLoaiSanPham}
+                                    </td>
+                                    <td>
+                                        <div className="action-group">
+                                            <button className="btn-action edit" onClick={() => handleOpenModal(loai)} title="Chỉnh sửa">
+                                                <Edit3 size={16} />
+                                            </button>
+                                            <button className="btn-action delete" onClick={() => handleDelete(loai.maLoaiSanPham, loai.tenLoaiSanPham)} title="Xóa">
+                                                <Trash2 size={16} />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
-                            ) : (
-                                danhSachLoai.map((loai) => (
-                                    <tr key={loai.maLoaiSanPham}>
-                                        <td className="ma-loai">{loai.maLoaiSanPham}</td>
-                                        <td className="ten-loai text-left">
-                                            <span className="bullet-point"></span>
-                                            {loai.tenLoaiSanPham}
-                                        </td>
-                                        <td>
-                                            <div className="action-group">
-                                                <button className="btn-action edit" onClick={() => handleOpenModal(loai)} title="Chỉnh sửa">
-                                                    <Edit3 size={16} />
-                                                </button>
-                                                <button className="btn-action delete" onClick={() => handleDelete(loai.maLoaiSanPham, loai.tenLoaiSanPham)} title="Xóa">
-                                                    <Trash2 size={16} />
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
-
-                {showModal && (
-                    <LoaiSanPhamForm 
-                        isEdit={isEdit}
-                        initialData={editData}
-                        onClose={() => setShowModal(false)}
-                        onRefresh={fetchData}
-                    />
-                )}
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
-        );
-    }
+
+            {showModal && (
+                <LoaiSanPhamForm 
+                    isEdit={isEdit}
+                    initialData={editData}
+                    onClose={() => setShowModal(false)}
+                    onRefresh={fetchData}
+                />
+            )}
+        </div>
+    );
+}

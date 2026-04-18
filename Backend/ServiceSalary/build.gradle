@@ -26,7 +26,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     // 👇 THÊM DÒNG NÀY VÀO ĐÂY
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
@@ -52,10 +52,11 @@ dependencies {
 // 2. Thêm khối quản lý dependency của Spring Cloud (BẮT BUỘC PHẢI CÓ CHO FEIGN)
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.1"    }
 }
-
 tasks.named('test') {
     useJUnitPlatform()
+}
+jar {
+    enabled = false
 }
