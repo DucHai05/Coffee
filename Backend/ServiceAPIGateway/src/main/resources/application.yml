@@ -1,9 +1,8 @@
 server:
-  port: 8080
+  port: ${PORT:8080} # Render sẽ tự cấp port qua biến môi trường, mặc định là 8080
 
 spring:
   application:
-    # ĐÂY LÀ DÒNG BẮT BUỘC: Đặt tên để Eureka và Gateway nhận diện
     name: service-apigateway
   cloud:
     gateway:
@@ -12,7 +11,11 @@ spring:
       globalcors:
         cors-configurations:
           '[/**]':
-            allowedOrigins: "http://localhost:5173"
+            # Thêm domain Vercel của bạn vào đây
+            allowedOrigins: 
+              - "http://localhost:5173"
+              - "http://localhost:3000"
+              - "https://coffeeofduchai.vercel.app"
             allowedMethods: "*"
             allowedHeaders: "*"
             allowCredentials: true
@@ -85,10 +88,9 @@ spring:
 eureka:
   client:
     service-url:
-      # Thay localhost bằng eureka-server (tên service trong docker-compose)
-      defaultZone: http://eureka-server:8761/eureka/
+      # Sử dụng biến môi trường để linh hoạt giữa Local và Render
+      defaultZone: ${EUREKA_SERVER_URL:http://eureka-server:8761/eureka/}
     fetch-registry: true
     register-with-eureka: true
   instance:
-    # Trong môi trường Docker, dùng hostname của container thay vì IP sẽ ổn định hơn
     prefer-ip-address: true
