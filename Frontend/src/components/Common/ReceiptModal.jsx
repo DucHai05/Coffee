@@ -5,7 +5,7 @@ const ReceiptModal = ({
     isOpen, onClose, nameTable, maBan, nameStaff, cart, subTotal, 
     autoDiscount, autoDiscountVal, 
     manualDiscount, manualDiscountVal, 
-    totalAmount, onConfirm 
+    totalAmount, maHoaDon, onConfirm 
 }) => {
     // 1. Khai báo state để chọn phương thức thanh toán (Mặc định là Tiền mặt)
     const [paymentMethod, setPaymentMethod] = useState('CASH');
@@ -19,7 +19,7 @@ const ReceiptModal = ({
                 <div className="receipt-body">
                 <div className="receipt-info">
                     <div className="info-row">
-                        <span>Mã HD: <strong>#HAI{Date.now().toString().slice(-5)}</strong></span>
+                        <span>Mã HD: <strong>{maHoaDon || `#HAI${Date.now().toString().slice(-5)}`}</strong></span>
                         <span>TN: <strong>{nameStaff}</strong></span>
                     </div>
                     <div className="info-row">

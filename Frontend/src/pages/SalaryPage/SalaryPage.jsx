@@ -5,40 +5,64 @@ import { employeeApi, salaryApi } from '../../api/APIGateway';
 import "./salary.css";
 
 function SalaryManagement() {
+    const [showModal, setShowModal] = useState(false); 
+    const [selectedItem, setSelectedItem] = useState(null);
     const [salaryData, setSalaryData] = useState([]);
     const [filter, setFilter] = useState({ thang: 4, nam: 2026 });
     const [loading, setLoading] = useState(false);
-    const [employeeNames, setEmployeeNames] = useState({});
+    const [employeeNames, setEmployeeNames] = useState({}); 
     const [searchTerm, setSearchTerm] = useState("");
-
-    const [showModal, setShowModal] = useState(false);
-    const [selectedItem, setSelectedItem] = useState(null);
-
-    // Form điều chỉnh nhanh
     const [newAdj, setNewAdj] = useState({ loaiPhieu: 'THUONG', soTien: '', ghiChu: '' });
+    const [isInitialized, setIsInitialized] = useState(false);
 
-    const loadEmployeeNames = async () => {
+    // Dùng useCallback để tránh re-render vô tận
+    const loadEmployeeNames = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
-            const res = await employeeApi.getAll();
+            if (!token) {
+                console.warn("Không tìm thấy token");
+                return;
+            }
+            const res = await employeeApi.getAll(token);
+            
             const nameMap = {};
-            res.data.forEach(emp => { nameMap[emp.maNhanVien] = emp.tenNhanVien; });
+            res.data.forEach(emp => {
+                nameMap[emp.maNhanVien] = emp.tenNhanVien;
+            });
             setEmployeeNames(nameMap);
-        } catch (error) { console.error("Lỗi lấy danh sách nhân viên:", error); }
-    };
+        } catch (error) {
+            console.error("Lỗi lấy danh sách nhân viên:", error);
+        }
+    }, []);
 
     const loadData = useCallback(async () => {
         try {
             const token = localStorage.getItem("token");
+            if (!token) {
+                console.warn("Không tìm thấy token");
+                return;
+            }
             const res = await salaryApi.getAll(filter.thang, filter.nam, token);
             setSalaryData(res.data);
-        } catch (error) { console.error("Lỗi tải dữ liệu lương:", error); }
+        } catch (error) {
+            console.error("Lỗi tải dữ liệu lương:", error);
+        }
     }, [filter]);
 
     useEffect(() => {
+        // Check token khi component mount, nếu không có thì redirect ngay
+        const token = localStorage.getItem("token");
+        if (!token) {
+            console.warn("Không tìm thấy token, redirect về login");
+            window.location.href = "/login";
+            return;
+        }
+        
+        // Nếu có token, bắt đầu load data
         loadEmployeeNames();
         loadData();
-    }, [loadData]);
+        setIsInitialized(true);
+    }, []);
 
     const stats = {
         tongLuong: salaryData.reduce((s, i) => s + (i.loaiPhieu === 'LUONG' ? i.soTien : 0), 0),
@@ -89,10 +113,24 @@ function SalaryManagement() {
         if (window.confirm(`Xác nhận thanh toán cho nhân viên này?`)) {
             try {
                 const token = localStorage.getItem("token");
+                if (!token) {
+                    alert("Phiên đăng nhập hết hạn!");
+                    window.location.href = "/login";
+                    return;
+                }
                 await salaryApi.pay(maNV, filter.thang, filter.nam, token);
                 alert("Thanh toán thành công!");
                 loadData();
-            } catch { alert("Lỗi khi thanh toán!"); }
+            } catch (error) {
+                console.error("Lỗi thanh toán:", error);
+                if (error.response?.status === 401) {
+                    alert("Phiên đăng nhập hết hạn! Vui lòng đăng nhập lại.");
+                    localStorage.clear();
+                    window.location.href = "/login";
+                } else {
+                    alert("Lỗi khi thanh toán!");
+                }
+            }
         }
     };
 
@@ -100,18 +138,37 @@ function SalaryManagement() {
         setLoading(true);
         try {
             const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Phiên đăng nhập hết hạn!");
+                window.location.href = "/login";
+                return;
+            }
             await salaryApi.calculateAll(filter.thang, filter.nam, token);
             alert("Đã tổng hợp lương thành công!");
             loadData();
         } catch (error) {
-            alert(error.response?.data || "Lỗi tính lương!");
-        } finally { setLoading(false); }
+            console.error("Lỗi tính lương:", error);
+            if (error.response?.status === 401) {
+                alert("Phiên đăng nhập hết hạn! Vui lòng đăng nhập lại.");
+                localStorage.clear();
+                window.location.href = "/login";
+            } else {
+                alert(error.response?.data || "Lỗi tính lương!");
+            }
+        } finally { 
+            setLoading(false); 
+        }
     };
 
     const handleAddAdjustment = async () => {
         if (!newAdj.soTien || !newAdj.ghiChu) return alert("Nhập đủ tiền và lý do!");
         try {
             const token = localStorage.getItem("token");
+            if (!token) {
+                alert("Phiên đăng nhập hết hạn!");
+                window.location.href = "/login";
+                return;
+            }
             await salaryApi.create({
                 maNhanVien: selectedItem.maNhanVien,
                 loaiPhieu: newAdj.loaiPhieu,
@@ -123,7 +180,16 @@ function SalaryManagement() {
             alert("Đã thêm điều chỉnh!");
             setNewAdj({ loaiPhieu: 'THUONG', soTien: '', ghiChu: '' });
             await loadData();
-        } catch { alert("Lỗi khi thêm điều chỉnh!"); }
+        } catch (error) {
+            console.error("Lỗi thêm điều chỉnh:", error);
+            if (error.response?.status === 401) {
+                alert("Phiên đăng nhập hết hạn! Vui lòng đăng nhập lại.");
+                localStorage.clear();
+                window.location.href = "/login";
+            } else {
+                alert("Lỗi khi thêm điều chỉnh!");
+            }
+        }
     };
 
     const handleCloseModal = () => {

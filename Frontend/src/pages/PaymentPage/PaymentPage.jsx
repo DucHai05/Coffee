@@ -153,6 +153,7 @@ const PaymentPage = () => {
                 autoDiscountVal={subTotalTuState - totalTuState || 0} 
                 manualDiscount={manualDiscount}
                 totalAmount={totalTuState || order?.tongTien}
+                maHoaDon={maHDTuState || order?.maHoaDon}
                 onConfirm={handleConfirmPayment} 
             /> 
         </div>

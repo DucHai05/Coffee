@@ -5,7 +5,8 @@ import '../CommonCSS/kitchenSlipModal.css';
 const KitchenSlipModal = ({ isOpen, onClose, nameTable, cart, onConfirm, maHoaDon }) => {
     if (!isOpen) return null;
 
-    const isAdjusting = cart.some(item => item.ghiChu?.includes("HỦY") || item.ghiChu?.includes("THÊM"));
+    const slipMessage = item => item.slipNote || item.ghiChu;
+    const isAdjusting = cart.some(item => slipMessage(item)?.includes("HỦY") || slipMessage(item)?.includes("THÊM"));
     const currentTime = new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
     const currentDate = new Date().toLocaleDateString('vi-VN');
     const tenNV = localStorage.getItem('tenNhanVien') || 'Nhân viên';
@@ -53,10 +54,10 @@ const KitchenSlipModal = ({ isOpen, onClose, nameTable, cart, onConfirm, maHoaDo
                                 </thead>
                                 <tbody>
                                     {cart.map((item, i) => (
-                                        <tr key={i} className={item.ghiChu?.includes("HỦY") ? 'item-cancel' : ''}>
+                                        <tr key={i} className={slipMessage(item)?.includes("HỦY") ? 'item-cancel' : ''}>
                                             <td>
                                                 <div className="item-name">{item.tenSanPham || item.tenMon}</div>
-                                                {item.ghiChu && <span className="item-note">[{item.ghiChu}]</span>}
+                                                {slipMessage(item) && <span className="item-note">[{slipMessage(item)}]</span>}
                                             </td>
                                             <td align="right" className="item-qty">x{item.soLuong}</td>
                                         </tr>

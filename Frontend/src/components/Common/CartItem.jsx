@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../CommonCSS/cartItem.css';
 
 const CartItem = ({ item, idx, onRemove, onClick, onUpdateQty }) => {
-    // 1. Tạo state nội bộ để quản lý việc nhập liệu
     const [tempQty, setTempQty] = useState(item.soLuong);
 
-    // 2. Cập nhật state nội bộ nếu món ăn ở lớp cha thay đổi (ví dụ bấm thêm món từ menu)
     useEffect(() => {
         setTempQty(item.soLuong);
     }, [item.soLuong]);
@@ -13,18 +11,14 @@ const CartItem = ({ item, idx, onRemove, onClick, onUpdateQty }) => {
     const handleQtyChange = (e) => {
         e.stopPropagation();
         const val = e.target.value;
-        
-        // Cho phép hiển thị chuỗi rỗng trên màn hình để user xóa gõ lại
         setTempQty(val); 
 
         const newQty = parseInt(val);
-        // Chỉ báo lên cha nếu là số hợp lệ và lớn hơn 0
         if (!isNaN(newQty) && newQty > 0) {
             onUpdateQty(idx, newQty);
         }
     };
 
-    // Xử lý khi rời khỏi ô input mà đang để trống thì reset về 1
     const handleBlur = () => {
         if (tempQty === "" || parseInt(tempQty) <= 0) {
             setTempQty(1);
@@ -34,29 +28,33 @@ const CartItem = ({ item, idx, onRemove, onClick, onUpdateQty }) => {
 
     return (
         <div className="cart-item-row" onClick={() => onClick(idx)}>
+            {/* Cột thông tin: Tên và Ghi chú xếp chồng */}
             <div className="col-info">
                 <span className="item-name">{item.tenSanPham}</span>
                 {item.ghiChu && (
-                    <span className="item-note-inline">— {item.ghiChu}</span>
+                    <span className="item-note">{item.ghiChu}</span>
                 )}
             </div>
 
+            {/* Cột số lượng */}
             <div className="col-qty" onClick={(e) => e.stopPropagation()}>
                 <input
                     type="number"
                     className="qty-input"
-                    value={tempQty} // Dùng state nội bộ
+                    value={tempQty}
                     onChange={handleQtyChange}
-                    onBlur={handleBlur} // Tự động sửa nếu user để trống
+                    onBlur={handleBlur}
                     min="1"
                     onFocus={(e) => e.target.select()}
                 />
             </div>
 
+            {/* Cột thành tiền */}
             <div className="col-price">
                 {(item.giaBan * (parseInt(tempQty) || 0)).toLocaleString()}đ
             </div>
 
+            {/* Nút xóa */}
             <div className="col-actions">
                 <button 
                     className="remove-btn" 

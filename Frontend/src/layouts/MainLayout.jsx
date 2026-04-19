@@ -149,37 +149,39 @@ const MainLayout = () => {
           <NavLink to="/cham-cong" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
             <TableProperties size={20} /> <span>Chấm công</span>
           </NavLink>
-        </nav>
-
-        <nav className="nav-group">
-          <label>Quản lý</label>
-          <NavLink to="/discount" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <ClipboardList size={20} /> <span>Khuyến mãi</span>
-          </NavLink>
-          <NavLink to="/table-map" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <TableProperties size={20} /> <span>Bàn & Khu vực</span>
-          </NavLink>
-          <NavLink to="/doanh-thu" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <ClipboardList size={20} /> <span>Doanh thu</span>
-          </NavLink>
-          <NavLink to="/ca" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <History size={20} /> <span>Ca làm việc</span>
-          </NavLink>
-          <NavLink to="/nhan-su" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <History size={20} /> <span>Nhân sự</span>
-          </NavLink>
-          <NavLink to="/product" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <History size={20} /> <span>Sản phẩm</span>
-          </NavLink>
-          <NavLink to="/loai-sp" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <History size={20} /> <span>Loại sản phẩm</span>
-          </NavLink>
+          {userRole !== 'STAFF' && (
+            <>
+              <NavLink to="/discount" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <ClipboardList size={20} /> <span>Khuyến mãi</span>
+              </NavLink>
+              <NavLink to="/table-map" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <TableProperties size={20} /> <span>Bàn & Khu vực</span>
+              </NavLink>
+              <NavLink to="/doanh-thu" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <ClipboardList size={20} /> <span>Doanh thu</span>
+              </NavLink>
+              <NavLink to="/ca" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <History size={20} /> <span>Ca làm việc</span>
+              </NavLink>
+              <NavLink to="/nhan-su" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <History size={20} /> <span>Nhân sự</span>
+              </NavLink>
+              <NavLink to="/product" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <History size={20} /> <span>Sản phẩm</span>
+              </NavLink>
+              <NavLink to="/loai-sp" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+                <History size={20} /> <span>Loại sản phẩm</span>
+              </NavLink>
+            </>
+          )}
           <NavLink to="/store" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
             <History size={20} /> <span>Kho</span>
           </NavLink>
-          <NavLink to="/salary" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
-            <Settings size={20} /> <span>Lương/ Thưởng</span>
-          </NavLink>
+          {userRole !== 'STAFF'   && (
+            <NavLink to="/salary" className={({isActive}) => isActive ? 'nav-item active' : 'nav-item'}>
+              <Settings size={20} /> <span>Lương/ Thưởng</span>
+            </NavLink>
+          )}
         </nav>
 
         <div className="sidebar-footer">

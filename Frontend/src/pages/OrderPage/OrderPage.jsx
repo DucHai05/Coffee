@@ -121,7 +121,7 @@ const OrderPage = () => {
                     });
                     
                     setCart(itemsWithNames);
-                    setOriginalCart(itemsWithNames);
+                    setOriginalCart(itemsWithNames.map(item => ({ ...item })));
                     setMaHoaDon(idTuXuLy);
                 } else {
                     setCart([]);
@@ -170,6 +170,7 @@ const OrderPage = () => {
                 const newMaHD = res.data.savedHD?.maHoaDon || res.data.maHoaDon || maHoaDon;
                 
                 await tableApi.updateTrangThai(maBan, 'PENDING');
+                setOriginalCart(cart.map(item => ({ ...item, slipNote: undefined })));
                 
                 if (!isGoingToPayment) {
                     navigate('/sell');
@@ -187,19 +188,39 @@ const OrderPage = () => {
             }
 
                 const printItems = [];
+                const buildSlipNote = (item, action) => {
+                    if (item?.ghiChu) {
+                        return `${action} - ${item.ghiChu}`;
+                    }
+                    return action;
+                };
 
                 // 1. Tìm món mới hoặc món tăng số lượng
                 cart.forEach(item => {
                     const oldItem = originalCart.find(o => o.maSanPham === item.maSanPham);
                     if (!oldItem) {
                         // Món mới hoàn toàn
-                        printItems.push({ ...item, ghiChu: "MỚI" });
+                        printItems.push({ ...item, slipNote: buildSlipNote(item, "MỚI") });
                     } else if (item.soLuong > oldItem.soLuong) {
                         // Tăng số lượng
-                        printItems.push({ ...item, soLuong: item.soLuong - oldItem.soLuong, ghiChu: "THÊM" });
+                        printItems.push({
+                            ...item,
+                            soLuong: item.soLuong - oldItem.soLuong,
+                            slipNote: buildSlipNote(item, "THÊM")
+                        });
                     } else if (item.soLuong < oldItem.soLuong) {
                         // Giảm số lượng
-                        printItems.push({ ...item, soLuong: oldItem.soLuong - item.soLuong, ghiChu: "GIẢM/HỦY" });
+                        printItems.push({
+                            ...item,
+                            soLuong: oldItem.soLuong - item.soLuong,
+                            slipNote: buildSlipNote(item, "GIẢM/HỦY")
+                        });
+                    } else if (item.ghiChu !== oldItem.ghiChu) {
+                        // Ghi chú thay đổi mà số lượng không đổi
+                        printItems.push({
+                            ...item,
+                            slipNote: item.ghiChu || "CẬP NHẬT"
+                        });
                     }
                 });
 
@@ -207,7 +228,7 @@ const OrderPage = () => {
                 originalCart.forEach(oldItem => {
                     const stillInCart = cart.find(c => c.maSanPham === oldItem.maSanPham);
                     if (!stillInCart) {
-                        printItems.push({ ...oldItem, ghiChu: "HỦY MÓN" });
+                        printItems.push({ ...oldItem, slipNote: buildSlipNote(oldItem, "HỦY MÓN") });
                     }
                 });
 
@@ -295,10 +316,10 @@ const OrderPage = () => {
                     <div className="cart-actions-top" ref={menuRef}>
                         <span className="table-label">{nameTable}</span>
                         <button className="btn-more" onClick={() => setShowMenu(!showMenu)}><MoreVertical size={20}/></button>
-                        <OrderDropdown 
+                            <OrderDropdown 
                             show={showMenu} onClose={() => setShowMenu(false)}
                             onOpenPromo={() => { setIsPromoModalOpen(true); setShowMenu(false); }}
-                            onPrintKitchen={() => setIsKitchenSlipOpen(true)}
+                            onPrintKitchen={handlePrepareKitchenSlip}
                         />
                     </div>
                 </header>
@@ -313,7 +334,7 @@ const OrderPage = () => {
                         }}
                         onUpdateQty={(idx, qty) => {
                             const newCart = [...cart];
-                            newCart[idx].soLuong = qty;
+                            newCart[idx] = { ...newCart[idx], soLuong: qty };
                             setCart(newCart);
                         }}
                         onItemClick={(idx) => { setEditingIdx(idx); setIsNoteModalOpen(true); }}
@@ -338,7 +359,10 @@ const OrderPage = () => {
 
             {/* CÁC MODAL PHỤ TRỢ (Giữ nguyên component) */}
             <NoteModal isOpen={isNoteModalOpen} item={cart[editingIdx]} onSave={(note) => {
-                const newCart = [...cart]; newCart[editingIdx].ghiChu = note; setCart(newCart); setIsNoteModalOpen(false);
+                const newCart = [...cart];
+                newCart[editingIdx] = { ...newCart[editingIdx], ghiChu: note };
+                setCart(newCart);
+                setIsNoteModalOpen(false);
             }} onClose={() => setIsNoteModalOpen(false)} />
             
             <ConfirmDeleteModal isOpen={deleteConfirm.open} itemName={deleteConfirm.item?.tenSanPham} 
@@ -359,7 +383,9 @@ const OrderPage = () => {
             onConfirm={async () => { 
                 await handleConfirmOrder(false);
                 setIsKitchenSlipOpen(false); 
-            }} />
+            }} 
+            maHoaDon={maHoaDon}
+            />
         </div>
     );
 };
