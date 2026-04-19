@@ -111,12 +111,14 @@ export const khoApi = {
 // -----------------------------------------------------------
 const AUTH_API = `${GATEWAY_URL}/api/user/auth`;
 export const authApi = {
+    baseURL: () => `${BASE_URL}/user`,
     login: (data) => axios.post(`${AUTH_API}/login`, data),
     register: (data) => axios.post(`${AUTH_API}/register`, data),
     forgotPassword: (email) => axios.post(`${AUTH_API}/forgot`, { email }),
     verifyOTP: (email, otp) => axios.post(`${AUTH_API}/verify-otp`, { email, otp: otp.toString() }),
     resetPassword: (email, otp, newPassword) => axios.post(`${AUTH_API}/reset`, { email, otp: otp.toString(), newPassword }),
     getProfile: (token) => axios.get(`${GATEWAY_URL}/api/user/nhan-vien/me`, { headers: { Authorization: `Bearer ${token}` } }),
+
 };
 
 // APIGateway.js
@@ -147,11 +149,15 @@ export const employeeApi = {
 // -----------------------------------------------------------
 // TRONG APIGateway.js
 export const notificationApi = {
-    getByEmployee: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/list/${maNV}`),
+     getAllNoti: () => axios.get(`${BASE_URL}/notification/notifications`),
+     getByEmployee: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/list/${maNV}`),
+     create: (data, token) => axios.post(`${GATEWAY_URL}/api/notification/notifications/create`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+    }),
     
     // Giữ các hàm khác
     getUnreadCount: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/unread-count/${maNV}`),
-    markAsRead: (id) => axios.put(`${GATEWAY_URL}/api/notification/notifications/${id}/read`),
+    markAsRead: (id) => axios.put(`${GATEWAY_URL}/api/notification/notifications/read/${id}`),
 };
 
 // -----------------------------------------------------------

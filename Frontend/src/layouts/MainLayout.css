@@ -326,18 +326,38 @@
 }
 
 /* Nội dung thông báo (Xử lý cắt chữ 3 dòng) */
+.notification-list {
+  max-height: 60vh; /* Giới hạn chiều cao tối đa bằng 60% màn hình */
+  overflow-y: auto; /* Bật thanh cuộn dọc nếu nội dung dài quá */
+  padding-bottom: 8px;
+}
+
+/* Custom thanh cuộn cho đẹp (tùy chọn) */
+.notification-list::-webkit-scrollbar { width: 6px; }
+.notification-list::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 10px; }
+
+/* 2. ÉP TRÌNH DUYỆT HIỂN THỊ HẾT CHỮ KHI MỞ RỘNG (EXPANDED) */
 .notification-content {
   font-size: 0.85rem;
   color: #64748b;
-  padding-left: 26px; /* Để thẳng hàng với chữ tiêu đề, tránh đè lên icon */
+  padding-left: 26px; 
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 2; /* Lúc đóng lại chỉ cho hiện 2 dòng cho gọn */
   -webkit-box-orient: vertical;
   overflow: hidden;
-  white-space: pre-line;
+  white-space: pre-wrap; /* Giữ nguyên các dấu xuống dòng của danh sách nguyên liệu */
   line-height: 1.5;
+  transition: all 0.2s ease;
 }
 
+/* KHI CLICK VÀO SẼ KÍCH HOẠT CLASS NÀY ĐỂ BUNG CHỮ RA */
+.notification-content.expanded {
+  display: block !important; 
+  -webkit-line-clamp: unset !important; 
+  overflow: visible !important;
+  color: #334155; 
+  margin-top: 8px; /* Đẩy chữ xuống một xíu cho dễ đọc */
+}
 /* Khi không có thông báo */
 .notification-empty {
   padding: 40px 20px;

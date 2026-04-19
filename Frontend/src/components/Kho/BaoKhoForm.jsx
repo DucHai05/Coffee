@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { employeeApi, notificationApi } from '../../api/APIGateway';
 import './baoKhoForm.css';
 
@@ -44,42 +45,54 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
     };
 
     const handleSubmitAllBaoKho = async () => {
-        if (baoKhoItems.length === 0) return;
+    if (baoKhoItems.length === 0) return;
 
-        try {
-            const responseUser = await employeeApi.getAll();
-            const danhSachQuanLy = responseUser.data
-                .map(nv => nv.maNhanVien)
-                .filter(ma => ma.startsWith('QL'));
+    // Lấy token từ localStorage (phải khớp với key bạn lưu khi Login)
+    const token = localStorage.getItem('token'); 
+    
+    // In ra log để tự kiểm tra xem token có bị null không
+    console.log("Token hiện tại:", token); 
 
-            if (danhSachQuanLy.length === 0) {
-                alert("Không tìm thấy Quản lý nào trong hệ thống để gửi báo cáo!");
-                return;
-            }
+    try {
+        // 2. GỌI TRỰC TIẾP BẰNG AXIOS ĐỂ ÉP HEADER
+        const responseUser = await employeeApi.getAll(token);
+        
+        const danhSachQuanLy = responseUser.data
+            .map(nv => nv.maNhanVien)
+            .filter(ma => ma && ma.startsWith('QL'));
 
-            const noiDungGop = baoKhoItems.map((item) => `- ${item.tenNguyenLieu}: ${item.noiDung}`).join('\n');
-            const promises = [];
-
-            danhSachQuanLy.forEach(maQL => {
-                promises.push(notificationApi.create({
-                    maNhanVien: maQL,
-                    tieuDe: `Báo cáo kho (${baoKhoItems.length} nguyên liệu)`,
-                    noiDung: noiDungGop,
-                    loaiThongBao: 'KHO',
-                    idThamChieu: null
-                }));
-            });
-
-            await Promise.all(promises);
-
-            alert(`Đã gửi báo cáo tự động tới ${danhSachQuanLy.length} Quản lý thành công!`);
-            setBaoKhoItems([]);
-            onClose(); // Đóng form báo kho
-        } catch (error) {
-            console.error("Lỗi:", error);
-            alert("Đã xảy ra lỗi kết nối! Hãy chắc chắn API Gateway (8080) và các service đang chạy.");
+        if (danhSachQuanLy.length === 0) {
+            alert("Không tìm thấy Quản lý nào trong hệ thống để gửi báo cáo!");
+            return;
         }
-    };
+
+        const noiDungGop = baoKhoItems.map((item) => `- ${item.tenNguyenLieu}: ${item.noiDung}`).join('\n');
+        
+        // 3. GỬI THÔNG BÁO BẰNG AXIOS TRỰC TIẾP
+        const promises = danhSachQuanLy.map(maQL => 
+           notificationApi.create({ 
+                maNhanVien: maQL,
+                tieuDe: `Báo cáo kho (${baoKhoItems.length} nguyên liệu)`,
+                noiDung: noiDungGop,
+                loaiThongBao: 'KHO',
+                idThamChieu: null
+            }, token) // Truyền payload và token vào hàm create
+        );
+
+        await Promise.all(promises);
+
+        alert(`Đã gửi báo cáo tự động tới ${danhSachQuanLy.length} Quản lý thành công!`);
+        setBaoKhoItems([]);
+        onClose(); 
+    } catch (error) {
+        console.error("Lỗi:", error);
+        if (error.response?.status === 401) {
+            alert("Phiên đăng nhập hết hạn! Vui lòng đăng xuất và đăng nhập lại.");
+        } else {
+            alert("Đã xảy ra lỗi kết nối hệ thống!");
+        }
+    }
+};
 
   return (
     <div className="bk-container">

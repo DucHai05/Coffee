@@ -23,6 +23,7 @@ const MainLayout = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [expandedNotifId, setExpandedNotifId] = useState(null);
   
   const dropdownRef = useRef(null);
 
@@ -104,14 +105,19 @@ const MainLayout = () => {
 
   // Đánh dấu đã đọc khi click vào 1 thông báo
   const handleReadNotification = async (tb) => {
+    // 1. Lấy đúng ID (đề phòng backend trả về 'id' thay vì 'maThongBao')
+    const notifId = tb.maThongBao || tb.id;
+
+    // 2. Toggle mở rộng/thu gọn nội dung
+    setExpandedNotifId(prevId => prevId === notifId ? null : notifId);
+
+    // 3. Logic đánh dấu đã đọc (Mất chấm đỏ)
     if (!tb.daDoc) {
       try {
-        await notificationApi.markAsRead(tb.maThongBao);
-        // Giảm số trên chấm đỏ đi 1 (không để âm)
+        await notificationApi.markAsRead(notifId);
         setUnreadCount(prev => Math.max(0, prev - 1));
-        // Đổi trạng thái trong mảng thành đã đọc (daDoc: true)
         setNotifications(notifications.map(item => 
-          item.maThongBao === tb.maThongBao ? { ...item, daDoc: true } : item
+          (item.maThongBao === notifId || item.id === notifId) ? { ...item, daDoc: true } : item
         ));
       } catch (error) {
         console.error("Lỗi khi cập nhật trạng thái đã đọc:", error);
@@ -258,9 +264,9 @@ const MainLayout = () => {
                               </div>
                               
                               {/* Nội dung thông báo */}
-                              <div className="notification-content">
-                                {tb.noiDung}
-                              </div>
+                            <div className={`notification-content ${expandedNotifId === (tb.maThongBao || tb.id) ? 'expanded' : ''}`}>
+                              {tb.noiDung}
+                            </div>
                             </div>
                           ))
                         )}
