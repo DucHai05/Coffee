@@ -89,6 +89,7 @@ CREATE TABLE [dbo].[doanhthu](
 GO
 INSERT [dbo].[ca] VALUES (N'CA003', N'NV001', '2026-04-12', 1371000.00, N'Chiều 12/04', N'Mở', '16:59:15', NULL)
 GO
+<<<<<<< HEAD
 CREATE TABLE [dbo].[phieuthuchi](
 	[maPhieu] [varchar](50) NOT NULL,
 	[ghiChu] [nvarchar](255) NULL,
@@ -101,6 +102,8 @@ PRIMARY KEY CLUSTERED
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
+=======
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 
 -- =============================================
 -- 4. SERVICE NOTIFICATION

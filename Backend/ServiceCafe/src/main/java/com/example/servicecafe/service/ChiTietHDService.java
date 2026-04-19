@@ -24,8 +24,11 @@ public class ChiTietHDService {
     public List<ChiTietHD> getByMaHoaDon(HoaDon maHoaDon) {
         return chiTietHDRepository.findByMaHoaDon(maHoaDon);
     }
+<<<<<<< HEAD
 
     public List<ChiTietHD> getByMaHoaDon(String maHoaDon) {
         return chiTietHDRepository.findAllByMaHoaDon(maHoaDon);
     }
+=======
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 }

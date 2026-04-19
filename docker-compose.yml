@@ -9,7 +9,11 @@ services:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=CafePos@123456
     ports:
+<<<<<<< HEAD
       - "1434:1433" # Đổi lại 1433 để đồng bộ với URL kết nối bên dưới
+=======
+      - "1433:1433" # Đổi lại 1433 để đồng bộ với URL kết nối bên dưới
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
     volumes:
       - sqlserver_data:/var/opt/mssql
       # MAPPING FILE KHỞI TẠO VÀO CONTAINER

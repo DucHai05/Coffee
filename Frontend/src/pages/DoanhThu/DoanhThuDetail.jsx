@@ -1,5 +1,9 @@
 ﻿import React, { useEffect, useMemo, useState } from 'react';
+<<<<<<< HEAD
 import { hoaDonApi, tableApi, phieuThuChiApi, productApi } from '../../api/APIGateway';
+=======
+import { hoaDonApi, tableApi, doanhthuApi } from '../../api/APIGateway';
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 import { 
   ChevronLeft, 
   Info, 
@@ -13,14 +17,19 @@ import {
   Clock,
   ArrowUpRight,
   CreditCard,
+<<<<<<< HEAD
   Banknote,
   ArrowDownLeft
+=======
+  Banknote
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 } from 'lucide-react';
 import HoaDonDetail from '../../components/HoaDon/HoaDonDetail.jsx';
 import './DoanhThuDetail.css';
 
 const DoanhThuDetail = ({ doanhThu, onBack }) => {
     const [hoaDons, setHoaDons] = useState([]);
+<<<<<<< HEAD
     const [phieuThuChi, setPhieuThuChi] = useState([]);
     const [products, setProducts] = useState([]);
     const [banMap, setBanMap] = useState({});
@@ -45,15 +54,30 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
         if (normalized === 'CHI') return 'chi';
         return 'other';
     };
+=======
+    const [banMap, setBanMap] = useState({});
+    const [loading, setLoading] = useState(true);
+    const [selectedOrder, setSelectedOrder] = useState(null);
+
+    useEffect(() => {
+        if (doanhThu?.maCa) fetchRelatedData();
+    }, [doanhThu]);
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 
     const fetchRelatedData = async () => {
         try {
             setLoading(true);
+<<<<<<< HEAD
             const [hoaDonRes, banRes, phieuThuChiRes, productRes] = await Promise.all([
                 hoaDonApi.getByCa(maCa),
                 tableApi.getTables(),
                 phieuThuChiApi.getByCa(maCa),
                 productApi.getProducts()
+=======
+            const [hoaDonRes, banRes] = await Promise.all([
+                hoaDonApi.getByCa(doanhThu.maCa),
+                tableApi.getTables()
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
             ]);
 
             const map = {};
@@ -64,8 +88,11 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
             }
             setBanMap(map);
             setHoaDons(hoaDonRes.data || []);
+<<<<<<< HEAD
             setPhieuThuChi(phieuThuChiRes.data || []);
             setProducts(productRes.data || []);
+=======
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
         } catch (error) {
             console.error('Lỗi tải dữ liệu:', error);
         } finally {
@@ -75,6 +102,7 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
 
     // --- Logic xử lý dữ liệu (Giữ nguyên của Hải) ---
     const extractedProducts = useMemo(() => {
+<<<<<<< HEAD
         const productMap = new Map(
             (Array.isArray(products) ? products : []).map((product) => [product.maSanPham, product])
         );
@@ -105,10 +133,29 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
 
         return Array.from(groupedProducts.values());
     }, [hoaDons, products]);
+=======
+        const extracted = [];
+        hoaDons.forEach((order) => {
+            const items = order.items || order.chiTiet || [];
+            items.forEach((item) => {
+                extracted.push({
+                    maSP: item.maSanPham || '---',
+                    tenSP: item.tenSanPham || 'Sản phẩm',
+                    loai: item.loai || 'Khác',
+                    soLuong: Number(item.soLuong || 0),
+                    donGia: Number(item.giaBan || 0),
+                    thanhTien: Number(item.thanhTien || (item.soLuong * item.giaBan))
+                });
+            });
+        });
+        return extracted;
+    }, [hoaDons]);
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 
     const totals = useMemo(() => {
         return hoaDons.reduce((acc, order) => {
             const amount = Number(order.tongTienSauKM || order.tongTien || 0);
+<<<<<<< HEAD
             const method = normalizePaymentMethod(order.phuongThucThanhToan);
             if (method === 'cash') acc.cash += amount;
             else if (method === 'transfer') acc.transfer += amount;
@@ -132,6 +179,14 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
         thu: thuChiTotals.thu || Number(doanhThu?.tienThu || 0),
         chi: thuChiTotals.chi || Number(doanhThu?.tienChi || 0),
     };
+=======
+            if (order.phuongThucThanhToan === 'CASH') acc.cash += amount;
+            else if (order.phuongThucThanhToan === 'TRANSFER') acc.transfer += amount;
+            return acc;
+        }, { cash: 0, transfer: 0 });
+    }, [hoaDons]);
+    const soTienKet = Number(doanhThu?.ca?.soTienKet ?? doanhThu?.soTienKet ?? 0);
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 
     const formatCurrency = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
 
@@ -176,6 +231,7 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                     <div className="stats-inner-grid">
                         <div className="mini-stat">
                             <label>Tiền mặt</label>
+<<<<<<< HEAD
                             <div className="val cash"><Banknote size={16}/> {formatCurrency(summary.cash)}</div>
                         </div>
                         <div className="mini-stat">
@@ -193,6 +249,17 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                         <div className="mini-stat total">
                             <label>Tổng doanh thu thực tế</label>
                             <div className="val big">{formatCurrency(summary.cash + summary.transfer)}</div>
+=======
+                            <div className="val cash"><Banknote size={16}/> {formatCurrency(totals.cash)}</div>
+                        </div>
+                        <div className="mini-stat">
+                            <label>Chuyển khoản</label>
+                            <div className="val transfer"><CreditCard size={16}/> {formatCurrency(totals.transfer)}</div>
+                        </div>
+                        <div className="mini-stat total">
+                            <label>Tổng doanh thu thực tế</label>
+                            <div className="val big">{formatCurrency(totals.cash + totals.transfer)}</div>
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
                         </div>
                     </div>
                 </div>

@@ -178,12 +178,20 @@ const CaManager = () => {
                         <span>{activeCa?.gioMoCa?.split('.')[0] || '---'}</span>
                     </div>
                     <div className="info-box highlight">
+<<<<<<< HEAD
                         <label><Wallet size={14}/> Tiền mặt trong két</label>
+=======
+                        <label><Wallet size={14}/> Tiền đầu ca</label>
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
                         <span>{formatCurrency(activeCa?.soTienKet)}</span>
                     </div>
                 </div>
 
+<<<<<<< HEAD
                 <div className="card-footer">   
+=======
+                <div className="card-footer">
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
                     <button className="btn-close-ca" onClick={handleCloseCa} disabled={!activeCa}>
                         <ArrowRightCircle size={18} /> KẾT THÚC VÀ ĐÓNG CA
                     </button>

@@ -32,10 +32,13 @@ export const khuVucApi = {
     delete: (id) => axios.delete(`${GATEWAY_URL}/api/table/khuvuc/${id}`),
 };
 
+<<<<<<< HEAD
 export const chiTietHDApi = {
     getByHoaDon: (maHoaDon) => axios.get(`${GATEWAY_URL}/api/cafe/chitiethd/hoadon/${maHoaDon}`),
 };
 
+=======
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 // -----------------------------------------------------------
 // 2. SERVICE PROMOTION (Gateway: /api/promotion/**)
 // -----------------------------------------------------------
@@ -85,7 +88,10 @@ export const caApi = {
 
 export const doanhthuApi = {
     getMaCaDangMo: () => axios.get(`${GATEWAY_URL}/api/doanhthu/ca/getMaCaDangMo`),
+<<<<<<< HEAD
     getByCa: (maCa) => axios.get(`${GATEWAY_URL}/api/doanhthu/doanhthu/ca/${maCa}`),
+=======
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
     getAll: () => axios.get(`${GATEWAY_URL}/api/doanhthu/doanhthu`),
     updateAfterPayment: (maCa, phuongThuc, soTien) => {
         const payload = { amount: soTien, method: phuongThuc };
@@ -191,4 +197,8 @@ export const loaiSanPhamApi = {
 
 
 export const saveToken = (token) => localStorage.setItem("token", token);
+<<<<<<< HEAD
 export const logout = () => { localStorage.removeItem("token"); window.location.href = "/login"; };
+=======
+export const logout = () => { localStorage.removeItem("token"); window.location.href = "/login"; };
+>>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
