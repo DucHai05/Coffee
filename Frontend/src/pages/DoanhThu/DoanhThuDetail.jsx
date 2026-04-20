@@ -1,15 +1,15 @@
-﻿import React, { useEffect, useMemo, useState } from 'react';
-import { hoaDonApi, tableApi, doanhthuApi } from '../../api/APIGateway';
-import { 
-  ChevronLeft, 
-  Info, 
-  PieChart, 
-  Package, 
-  Receipt, 
-  MessageSquare, 
-  Zap, 
-  User, 
-  Calendar, 
+import React, { useEffect, useMemo, useState } from 'react';
+import { hoaDonApi, tableApi, productApi } from '../../api/APIGateway';
+import {
+  ChevronLeft,
+  Info,
+  PieChart,
+  Package,
+  Receipt,
+  MessageSquare,
+  Zap,
+  User,
+  Calendar,
   Clock,
   ArrowUpRight,
   CreditCard,
@@ -21,6 +21,7 @@ import './DoanhThuDetail.css';
 const DoanhThuDetail = ({ doanhThu, onBack }) => {
     const [hoaDons, setHoaDons] = useState([]);
     const [banMap, setBanMap] = useState({});
+    const [sanPhamMap, setSanPhamMap] = useState({});
     const [loading, setLoading] = useState(true);
     const [selectedOrder, setSelectedOrder] = useState(null);
 
@@ -31,44 +32,69 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
     const fetchRelatedData = async () => {
         try {
             setLoading(true);
-            const [hoaDonRes, banRes] = await Promise.all([
+            const [hoaDonRes, banRes, sanPhamRes] = await Promise.all([
                 hoaDonApi.getByCa(doanhThu.maCa),
-                tableApi.getTables()
+                tableApi.getTables(),
+                productApi.getProducts()
             ]);
 
-            const map = {};
+            const nextBanMap = {};
             if (Array.isArray(banRes.data)) {
                 banRes.data.forEach((ban) => {
-                    if (ban.maBan) map[ban.maBan] = ban.tenBan || ban.maBan;
+                    if (ban.maBan) nextBanMap[ban.maBan] = ban.tenBan || ban.maBan;
                 });
             }
-            setBanMap(map);
-            setHoaDons(hoaDonRes.data || []);
+
+            const nextSanPhamMap = {};
+            if (Array.isArray(sanPhamRes.data)) {
+                sanPhamRes.data.forEach((sanPham) => {
+                    if (sanPham.maSanPham) {
+                        nextSanPhamMap[sanPham.maSanPham] = sanPham;
+                    }
+                });
+            }
+
+            setBanMap(nextBanMap);
+            setSanPhamMap(nextSanPhamMap);
+            setHoaDons(Array.isArray(hoaDonRes.data) ? hoaDonRes.data : []);
         } catch (error) {
-            console.error('Lỗi tải dữ liệu:', error);
+            console.error('Loi tai du lieu:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    // --- Logic xử lý dữ liệu (Giữ nguyên của Hải) ---
     const extractedProducts = useMemo(() => {
-        const extracted = [];
+        const aggregated = {};
+
         hoaDons.forEach((order) => {
-            const items = order.items || order.chiTiet || [];
+            const items = order.chiTietHDs || order.items || order.chiTiet || [];
+
             items.forEach((item) => {
-                extracted.push({
-                    maSP: item.maSanPham || '---',
-                    tenSP: item.tenSanPham || 'Sản phẩm',
-                    loai: item.loai || 'Khác',
-                    soLuong: Number(item.soLuong || 0),
-                    donGia: Number(item.giaBan || 0),
-                    thanhTien: Number(item.thanhTien || (item.soLuong * item.giaBan))
-                });
+                const maSP = item.maSanPham || item.maMon || '---';
+                const sanPham = sanPhamMap[maSP] || {};
+                const soLuong = Number(item.soLuong || 0);
+                const donGia = Number(item.donGia ?? item.giaBan ?? sanPham.donGia ?? 0);
+                const key = `${maSP}-${donGia}`;
+
+                if (!aggregated[key]) {
+                    aggregated[key] = {
+                        maSP,
+                        tenSP: item.tenSanPham || item.tenMon || sanPham.tenSanPham || maSP,
+                        loai: sanPham.tenLoaiSanPham || item.loai || 'Chưa phân loại',
+                        soLuong: 0,
+                        donGia,
+                        thanhTien: 0
+                    };
+                }
+
+                aggregated[key].soLuong += soLuong;
+                aggregated[key].thanhTien += donGia * soLuong;
             });
         });
-        return extracted;
-    }, [hoaDons]);
+
+        return Object.values(aggregated);
+    }, [hoaDons, sanPhamMap]);
 
     const totals = useMemo(() => {
         return hoaDons.reduce((acc, order) => {
@@ -78,7 +104,6 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
             return acc;
         }, { cash: 0, transfer: 0 });
     }, [hoaDons]);
-    const soTienKet = Number(doanhThu?.ca?.soTienKet ?? doanhThu?.soTienKet ?? 0);
 
     const formatCurrency = (amount) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount || 0);
 
@@ -95,7 +120,6 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
 
     return (
         <div className="doanhthu-detail-wrapper">
-            {/* NAVIGATION BAR */}
             <div className="detail-nav">
                 <button className="btn-back-ghost" onClick={onBack}>
                     <ChevronLeft size={20} /> Quay lại
@@ -106,7 +130,6 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                 </div>
             </div>
 
-            {/* TOP INFO GRID */}
             <div className="detail-grid-top">
                 <div className="detail-card info-card">
                     <div className="card-header"><Info size={18}/> <h3>Thông tin ca làm việc</h3></div>
@@ -137,7 +160,6 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                 </div>
             </div>
 
-            {/* PRODUCTS SECTION */}
             <div className="detail-section">
                 <div className="section-header-modern">
                     <div className="h-left"><Package size={20}/> <h3>Sản phẩm đã bán ({extractedProducts.length})</h3></div>
@@ -146,12 +168,12 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                     <table className="modern-data-table">
                         <thead>
                             <tr>
-                                <th>Mã SP</th>
+                                <th>STT</th>
                                 <th>Tên sản phẩm</th>
                                 <th>Loại</th>
                                 <th>SL</th>
                                 <th>Đơn giá</th>
-                                <th style={{textAlign: 'right'}}>Thành tiền</th>
+                                <th style={{ textAlign: 'right' }}>Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -159,13 +181,13 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                                 <tr><td colSpan="6" className="table-empty">Trống</td></tr>
                             ) : (
                                 extractedProducts.map((p, idx) => (
-                                    <tr key={idx}>
-                                        <td className="txt-mono">{p.maSP}</td>
+                                    <tr key={`${p.maSP}-${p.donGia}-${idx}`}>
+                                        <td className="txt-mono">{idx + 1}</td>
                                         <td className="txt-bold">{p.tenSP}</td>
                                         <td><span className="cat-pill">{p.loai}</span></td>
                                         <td>{p.soLuong}</td>
                                         <td>{formatCurrency(p.donGia)}</td>
-                                        <td style={{textAlign: 'right'}} className="txt-indigo">{formatCurrency(p.thanhTien)}</td>
+                                        <td style={{ textAlign: 'right' }} className="txt-indigo">{formatCurrency(p.thanhTien)}</td>
                                     </tr>
                                 ))
                             )}
@@ -174,7 +196,6 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                 </div>
             </div>
 
-            {/* ORDERS SECTION */}
             <div className="detail-section">
                 <div className="section-header-modern">
                     <div className="h-left"><Receipt size={20}/> <h3>Lịch sử hóa đơn ({hoaDons.length})</h3></div>
@@ -202,7 +223,6 @@ const DoanhThuDetail = ({ doanhThu, onBack }) => {
                 </div>
             </div>
 
-            {/* NOTES GRID */}
             <div className="detail-grid-bottom">
                 <div className="detail-card note-card">
                     <div className="card-header"><MessageSquare size={18}/> <h3>Ghi chú bàn giao</h3></div>
