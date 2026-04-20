@@ -118,7 +118,7 @@
     border-radius: 10px;
     border: 1px solid var(--slate-200);
     outline: none;
-    color: var(--slate-800);
+    color: white;
     font-weight: 600;
 }
 
@@ -227,6 +227,7 @@
     background: var(--slate-50);
     font-size: 15px;
     transition: 0.2s;
+    color: black;
 }
 
 .password-wrapper input:focus {

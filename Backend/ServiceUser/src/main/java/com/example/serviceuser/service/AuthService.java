@@ -1,11 +1,13 @@
 package com.example.serviceuser.service;
 
 import com.example.serviceuser.dto.RegisterRequest;
+import com.example.serviceuser.email.EmailService;
 import com.example.serviceuser.entity.NhanVien;
 import com.example.serviceuser.entity.TaiKhoan;
 import com.example.serviceuser.repository.NhanVienRepository;
 import com.example.serviceuser.repository.TaiKhoanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,8 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final IdGeneratorService idGenerator;
+    @Autowired
+    private EmailService emailService;
 
     /**
      * LOGIC REGISTER: Tạo Thương hiệu -> Tạo Nhân viên Quản lý -> Tạo Tài khoản Admin
@@ -69,7 +73,6 @@ public class AuthService {
         TaiKhoan tk = taiKhoanRepository.findByTenDangNhap(username)
                 .orElseThrow(() -> new RuntimeException("Tài khoản không tồn tại"));
 
-        System.out.println("Mat khau thuc te nguoi dung nhap la: " + password);
         if (!passwordEncoder.matches(password, tk.getMatKhau())) {
             throw new RuntimeException("Sai mật khẩu!");
         }
@@ -100,10 +103,10 @@ public class AuthService {
                 .orElseThrow(() -> new RuntimeException("Email không tồn tại trong hệ thống"));
 
         int otp = (int)(Math.random() * 900000) + 100000;
+
         tk.setOTP(otp);
         taiKhoanRepository.save(tk);
-
-        System.out.println(">>> MÃ OTP CỦA BẠN LÀ: " + otp);
+        emailService.sendOtp(email, String.valueOf(otp));
         return "Mã OTP đã được gửi đến email của bạn.";
     }
     @Transactional

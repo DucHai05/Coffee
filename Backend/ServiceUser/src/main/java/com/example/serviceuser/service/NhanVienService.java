@@ -1,13 +1,17 @@
 package com.example.serviceuser.service;
 
+import com.example.serviceuser.client.SalaryClient;
 import com.example.serviceuser.entity.NhanVien;
 import com.example.serviceuser.entity.TaiKhoan;
 import com.example.serviceuser.repository.NhanVienRepository;
 import com.example.serviceuser.repository.TaiKhoanRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,45 +19,67 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class NhanVienService {
+    @Autowired
+    private SalaryClient salaryClient;
 
     private final NhanVienRepository nhanVienRepository;
     private final TaiKhoanRepository taiKhoanRepository;
     private final IdGeneratorService idGenerator;
     private final PasswordEncoder passwordEncoder;
 
+    // Khởi tạo RestTemplate (Hoặc inject từ Config nếu bạn đã tạo Bean)
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    @Transactional
-    public NhanVien update(String maNV, NhanVien data) {
-        NhanVien nv = nhanVienRepository.findById(maNV)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên: " + maNV));
-
-        // Cập nhật các trường cần thiết
-        nv.setTenNhanVien(data.getTenNhanVien());
-        nv.setChucVu(data.getChucVu());
-        nv.setTienLuong(data.getTienLuong());
-        nv.setNgaySinh(data.getNgaySinh());
-
-        // Lưu ý: maThuongHieu thường không cho phép sửa đổi qua API này
-
-        return nhanVienRepository.save(nv);
+    // 1. LẤY DANH SÁCH: Chỉ lấy người đang làm
+    public List<NhanVien> findAll() {
+        // Giả sử bạn đã thêm findByTrangThai vào Repository
+        return nhanVienRepository.findByTrangThai("Đang làm");
     }
 
     @Transactional
     public void delete(String maNV) {
-        if (!nhanVienRepository.existsById(maNV)) {
-            throw new RuntimeException("Nhân viên không tồn tại");
+        // 1. Tìm thực thể nhân viên
+        NhanVien nv = nhanVienRepository.findById(maNV)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên"));
+
+        // 2. Kiểm tra lịch sử bên ServiceSalary (Feign tự đính kèm Token nhờ Interceptor)
+        boolean coLichSu = false;
+        try {
+            coLichSu = salaryClient.hasHistory(maNV);
+        } catch (Exception e) {
+            coLichSu = true; // Nếu service lương sập, mặc định xóa mềm để an toàn
         }
-        nhanVienRepository.deleteById(maNV);
+
+        // 3. Xử lý Tài khoản (Quan trọng để fix lỗi 500)
+        taiKhoanRepository.findByNhanVienMaNhanVien(maNV).ifPresent(tk -> {
+            nv.setTaiKhoan(null);      // Bước 1: Gỡ liên kết trong Java
+            taiKhoanRepository.delete(tk); // Bước 2: Lệnh xóa tài khoản
+            taiKhoanRepository.flush();    // Bước 3: Ép SQL xóa ngay lập tức
+        });
+
+        // 4. Thực thi xóa hoặc ẩn
+        if (coLichSu) {
+            nv.setTrangThai("Đã nghỉ"); // Xóa mềm
+            nhanVienRepository.save(nv);
+        } else {
+            try {
+                nhanVienRepository.delete(nv); // Xóa cứng
+            } catch (Exception e) {
+                nv.setTrangThai("Đã nghỉ"); // Quay xe sang xóa mềm nếu nảy sinh lỗi FK khác
+                nhanVienRepository.save(nv);
+            }
+        }
     }
 
     @Transactional
     public NhanVien addNhanVien(NhanVien nv) {
-        // 1. Tự động tạo mã Nhân viên (Ví dụ dựa trên chức vụ)
-        String loai = nv.getChucVu().equals("Quản lý") ? "QL" : "NV";
+        String loai = "Quản lý".equals(nv.getChucVu()) ? "QL" : "NV";
         nv.setMaNhanVien(idGenerator.taoMaNhanVien(loai));
         nv.setNgayVaoLam(java.time.LocalDate.now());
 
-        // 2. Lưu Nhân viên
+        // Luôn set trạng thái mặc định khi thêm mới
+        nv.setTrangThai("Đang làm");
+
         NhanVien savedNv = nhanVienRepository.save(nv);
 
         TaiKhoan tk = new TaiKhoan();
@@ -61,28 +87,40 @@ public class NhanVienService {
         tk.setTenDangNhap(nv.getTenDangNhap());
         tk.setMatKhau(passwordEncoder.encode("123456"));
 
-        // CHUẨN HÓA ROLE Ở ĐÂY:
         String chucVu = nv.getChucVu();
-        if (chucVu.equals("Quản lý")) {
-            tk.setLoaiTaiKhoan("ADMIN");
-        } else {
-            tk.setLoaiTaiKhoan("STAFF");
-        }
+        tk.setLoaiTaiKhoan("Quản lý".equals(chucVu) ? "ADMIN" : "STAFF");
 
         tk.setNhanVien(savedNv);
         taiKhoanRepository.save(tk);
 
         return savedNv;
     }
+
+    @Transactional
+    public NhanVien update(String maNV, NhanVien data) {
+        NhanVien nv = nhanVienRepository.findById(maNV)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên: " + maNV));
+
+        if (data.getTenNhanVien() == null || data.getTenNhanVien().isBlank()) {
+            throw new RuntimeException("Tên nhân viên không được để trống");
+        }
+
+        nv.setTenNhanVien(data.getTenNhanVien());
+        nv.setChucVu(data.getChucVu());
+        nv.setTienLuong(data.getTienLuong());
+        nv.setNgaySinh(data.getNgaySinh());
+
+        return nhanVienRepository.save(nv);
+    }
+
     public boolean existsById(String maNhanVien) {
         return nhanVienRepository.existsById(maNhanVien);
     }
-    public List<NhanVien> findAll() {
-        return nhanVienRepository.findAll();
-    }
+
     public Optional<NhanVien> getNhanVienByUsername(String username) {
         return nhanVienRepository.findByUsernameFromAccount(username);
     }
+
     public String getTenNhanVien(String maNV) {
         return nhanVienRepository.findTenByMa(maNV)
                 .orElse("Nhân viên không tồn tại");

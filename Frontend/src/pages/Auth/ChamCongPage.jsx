@@ -5,6 +5,7 @@ import "./chamcong.css";
 import { salaryApi } from '../../api/APIGateway';
 
 const ChamCong = () => {
+    // Lấy thông tin từ localStorage
     const [maNV] = useState(localStorage.getItem('maNhanVien'));
     const [tenNV] = useState(localStorage.getItem('tenNhanVien') || 'Nhân viên');
     const [role] = useState(localStorage.getItem('role'));
@@ -21,23 +22,49 @@ const ChamCong = () => {
         year: moment().year()
     });
 
-   const syncData = useCallback(async () => {
-    if (!maNV) return;
-    try {
-        const token = localStorage.getItem('token'); // LẤY TOKEN Ở ĐÂY
-        
-        const [resStatus, resDays] = await Promise.all([
-            salaryApi.getStatus(maNV, token), // TRUYỀN TOKEN
-            salaryApi.getActiveDays(maNV, viewDate.month, viewDate.year, token) // TRUYỀN TOKEN
-        ]);
-        // ... giữ nguyên logic xử lý resStatus và resDays bên dưới
-    } catch (error) {
-        console.error("Lỗi đồng bộ qua Gateway:", error);
-    }
-}, [maNV, viewDate]);
+    /**
+     * Đồng bộ dữ liệu sử dụng salaryApi từ APIGateway
+     */
+    const syncData = useCallback(async () => {
+        if (!maNV) return;
+        try {
+            const token = localStorage.getItem('token'); // Lấy token để xác thực
+            
+            // Gọi đồng thời trạng thái hiện tại và lịch sử trong tháng
+            const [resStatus, resDays] = await Promise.all([
+                salaryApi.getStatus(maNV, token),
+                salaryApi.getActiveDays(maNV, viewDate.month, viewDate.year, token)
+            ]);
+
+            // Cập nhật trạng thái đang làm việc
+            if (resStatus.status === 200 && resStatus.data) {
+                setStatus({ 
+                    isWorking: true, 
+                    startTime: moment(resStatus.data.thoiGianVao).format()
+                });
+            } else {
+                setStatus({ isWorking: false, startTime: null });
+            }
+
+            // Cập nhật danh sách ngày công
+            if (resDays.data) {
+                setActiveDays(resDays.data);
+                const total = resDays.data.reduce((sum, item) =>
+                    sum + (Number(item.totalHours || item.TOTALHOURS) || 0), 0
+                );
+                setTotalHoursMonth(total);
+            }
+        } catch (error) {
+            console.error("Lỗi đồng bộ qua Gateway:", error);
+            if (error.response?.status === 401) {
+                alert("Phiên đăng nhập hết hạn!");
+            }
+        }
+    }, [maNV, viewDate]);
 
     useEffect(() => { syncData(); }, [syncData]);
 
+    // Logic đồng hồ đếm giờ
     useEffect(() => {
         let timer = null;
         if (status.isWorking && status.startTime) {
@@ -56,36 +83,48 @@ const ChamCong = () => {
         return () => clearInterval(timer);
     }, [status.isWorking, status.startTime]);
 
+    /**
+     * Xử lý Vào ca / Tan làm
+     */
     const handleAction = async () => {
         const msg = status.isWorking ? "Bạn muốn kết thúc ca làm?" : "Bạn muốn bắt đầu vào ca?";
         if (!window.confirm(msg)) return;
-       setLoading(true);
-            try {
-                const token = localStorage.getItem('token'); // LẤY TOKEN
-                await salaryApi.thucHien(maNV, token); // TRUYỀN TOKEN
+        
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            // Gọi hàm thucHien (POST /api/cham-cong/thuc-hien)
+            await salaryApi.thucHien(maNV, token); 
+            
+            // Sau khi chấm công, đợi một chút để DB cập nhật rồi lấy lại dữ liệu
+            setTimeout(async () => {
                 await syncData();
                 setSelectedDayInfo(null);
-            } catch (error) {
-                alert(error.response?.data || "Lỗi hệ thống Gateway!");
-            } finally {
-                setLoading(false);
-            }
+            }, 300);
+        } catch (error) {
+            alert(error.response?.data || "Lỗi hệ thống chấm công!");
+        } finally {
+            setLoading(false);
+        }
     };
 
+    /**
+     * Sửa ca lỗi (Chỉ dành cho ADMIN)
+     */
     const handleFixError = async () => {
         if (!fixTime) return alert("Vui lòng chọn giờ ra!");
-            setLoading(true);
-            try {
-                const token = localStorage.getItem('token'); // LẤY TOKEN
-                await salaryApi.fixCaLoi({
-                    maNV,
-                    day: Number(selectedDayInfo.day || selectedDayInfo.DAY),
-                    month: Number(viewDate.month),
-                    year: Number(viewDate.year),
-                    gioRaMoi: fixTime
-                }, token); // TRUYỀN TOKEN VÀO ĐÂY
-                
-                alert("Đã cập nhật giờ làm thành công!");
+        setLoading(true);
+        try {
+            const token = localStorage.getItem('token');
+            await salaryApi.fixCaLoi({
+                maNV,
+                day: Number(selectedDayInfo.day || selectedDayInfo.DAY),
+                month: Number(viewDate.month),
+                year: Number(viewDate.year),
+                gioRaMoi: fixTime
+            }, token);
+            
+            alert("Đã cập nhật giờ làm thành công!");
             setFixTime("");
             setSelectedDayInfo(null);
             await syncData();
@@ -96,6 +135,7 @@ const ChamCong = () => {
         }
     };
 
+    // Render Logic cho Lịch
     const daysInMonth = moment(`${viewDate.year}-${viewDate.month}`, "YYYY-M").daysInMonth();
     const firstDay = moment(`${viewDate.year}-${viewDate.month}-01`, "YYYY-M-D").isoWeekday();
     const calendarGrid = [];
@@ -127,12 +167,10 @@ const ChamCong = () => {
                         const dayData = activeDays.find(d => Number(d.day || d.DAY) === Number(day));
                         const isSelected = (Number(selectedDayInfo?.day || selectedDayInfo?.DAY) === Number(day));
 
-                        // LẤY BIẾN ISPROCESSING TỪ BACKEND
                         const isProcessing = dayData?.isProcessing === 1 || dayData?.ISPROCESSING === 1;
                         const total = Number(dayData?.totalHours ?? dayData?.TOTALHOURS ?? 0);
                         const errorCount = Number(dayData?.errorCount ?? dayData?.ERRORCOUNT ?? 0);
 
-                        // Chỉ báo lỗi nếu KHÔNG ĐANG LÀM và CÓ LỖI
                         const isError = dayData && errorCount > 0 && !isProcessing;
                         const isActive = dayData && total > 0;
 
@@ -197,7 +235,6 @@ const ChamCong = () => {
                     {loading ? "ĐANG XỬ LÝ..." : (status.isWorking ? "TAN LÀM" : "VÀO CA")}
                 </button>
 
-                {/* CHỈ HIỆN SỬA LỖI NẾU KHÔNG PHẢI ĐANG TRONG CA VÀ LÀ ADMIN */}
                 {selectedDayInfo &&
                     !selectedDayInfo.noRecord &&
                     !selectedDayInfo.isProcessing &&

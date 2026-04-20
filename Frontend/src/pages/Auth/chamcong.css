@@ -26,9 +26,9 @@
     animation: fadeIn 0.4s ease-out;
 }
 
-@keyframes fadeIn { 
-    from { opacity: 0; transform: translateY(10px); } 
-    to { opacity: 1; transform: translateY(0); } 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 /* ===== CARD CHUNG ===== */
@@ -121,22 +121,44 @@
 }
 
 .cc-day:active {
-    transform: scale(0.92); /* Hiệu ứng lún khi click chọn ngày */
+    transform: scale(0.92);
 }
 
-/* Ngày đã làm việc (Active) */
+/* --- CHỈNH SỬA KHU VỰC NÀY --- */
+
+/* 1. Ngày đã làm việc bình thường (Màu xanh) */
 .cc-day.is-active {
-    background: #ecfdf5;
-    color: var(--success);
+    background: #5bf183 !important;
+    color: #065f46 !important;
     border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
-/* Ngày đang được chọn (Selected) */
+/* Ngày bị lỗi (Quên tan ca) - Màu đỏ */
+.cc-day.is-error {
+    background-color: #fee2e2 !important; /* Màu đỏ nhạt */
+    color: #ef4444 !important;           /* Chữ đỏ */
+    border: 1px solid #fecaca !important; /* Viền đỏ */
+}
+
+/* Ép cái chấm nhỏ cũng màu đỏ */
+.cc-day.is-error .cc-dot {
+    background-color: #ef4444 !important;
+}
+
+/* 3. Ngày đang được chọn (Viền Indigo) */
 .cc-day.is-selected {
-    border: 2px solid var(--indigo-600);
+    border: 2px solid var(--indigo-600) !important;
     background: var(--indigo-50);
     color: var(--indigo-600);
 }
+
+/* Khi chọn vào ô lỗi thì viền đỏ thay vì viền xanh */
+.cc-day.is-error.is-selected {
+    border: 2px solid #ff4d4f !important;
+    box-shadow: 0 0 0 2px rgba(255, 77, 79, 0.2);
+}
+
+/* --- GIỮ NGUYÊN TOÀN BỘ PHẦN CÒN LẠI --- */
 
 .cc-dot {
     position: absolute;
@@ -254,4 +276,121 @@
 .cc-btn:hover {
     filter: brightness(1.1);
     transform: translateY(-2px);
+}
+/* Trạng thái bên trái */
+/* ===== STATUS BADGE (ĐẸP HƠN) ===== */
+.status-badge {
+    margin-top: 8px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+/* Thành công */
+.status-badge.success {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    color: #059669;
+    border: 1px solid #a7f3d0;
+}
+
+/* Lỗi */
+.status-badge.error {
+    background: linear-gradient(135deg, #fff1f2, #ffe4e6);
+    color: #dc2626;
+    border: 1px solid #fecaca;
+    box-shadow: 0 0 0 2px rgba(220, 38, 38, 0.1);
+}
+
+/* Không có dữ liệu */
+.status-badge.none {
+    background: #f8fafc;
+    color: #94a3b8;
+    border: 1px dashed #e2e8f0;
+}
+
+/* Hover nhẹ cho badge */
+.status-badge:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.05);
+}
+
+
+/* ===== FIX SECTION (NÂNG CẤP UI) ===== */
+.cc-fix-section {
+    margin-top: 18px;
+    text-align: left;
+    padding: 14px;
+    background: linear-gradient(135deg, #fff7e6, #fff1cc);
+    border-radius: 12px;
+    border: 1px dashed #fbbf24;
+    animation: fadeInFix 0.3s ease;
+}
+
+@keyframes fadeInFix {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.cc-fix-section h4 {
+    font-size: 13px;
+    color: #d97706;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+/* Input + Button */
+.fix-input-group {
+    display: flex;
+    gap: 8px;
+}
+
+/* Input đẹp hơn */
+.fix-input-group input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid #fcd34d;
+    border-radius: 6px;
+    background: #fff;
+    font-size: 13px;
+    outline: none;
+    transition: 0.2s;
+    color: black;
+}
+
+.fix-input-group input:focus {
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
+}
+
+/* Button xịn hơn */
+.fix-input-group button {
+    background: linear-gradient(135deg, #f59e0b, #f97316);
+    color: rgb(0, 0, 0);
+    border: none;
+    padding: 0 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.fix-input-group button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 12px -4px rgba(249, 115, 22, 0.5);
+}
+
+.fix-input-group button:active {
+    transform: scale(0.95);
+}
+
+.fix-input-group button:disabled {
+    background: #fde68a;
+    cursor: not-allowed;
+    box-shadow: none;
 }

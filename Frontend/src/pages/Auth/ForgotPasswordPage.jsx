@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// IMPORT AUTH_API TỪ FILE TỔNG HỢP CỦA BẠN
-import { authApi } from '../../api/APIGateway'; 
 import "./forgot.css";
+// IMPORT FILE API TỔNG HỢP
+import { authApi } from '../../api/APIGateway';
 
 export default function ForgotPassword() {
     const [step, setStep] = useState(1);
@@ -13,45 +13,61 @@ export default function ForgotPassword() {
     const [confirm, setConfirm] = useState("");
     const [showPassword, setShowPassword] = useState(false);
 
-    // BƯỚC 1: GỬI OTP
+    // Bước 1: Gửi yêu cầu OTP qua Gateway
     const handleSendOTP = async () => {
+        if (!email) return alert("Vui lòng nhập email!");
         try {
+            // Sử dụng authApi.forgot thay vì fetch thủ công
             const res = await authApi.forgotPassword(email);
-            // Với Axios, nếu thành công (status 2xx) nó sẽ chạy tiếp
-            setStep(2);
+            if (res.status === 200) {
+                alert("Mã OTP đã được gửi đến email của bạn.");
+                setStep(2);
+            }
         } catch (error) {
-            alert(error.response?.data || "Email không tồn tại hoặc lỗi server!");
+            alert(error.response?.data || "Email không tồn tại trong hệ thống!");
         }
     };
 
-    // BƯỚC 2: XÁC THỰC OTP
+    // Bước 2: Xác thực OTP qua Gateway
     const handleVerifyOTP = async () => {
+        if (!otp) return alert("Vui lòng nhập mã OTP!");
         try {
-            const res = await authApi.verifyOTP(email, otp);
-            setStep(3);
+            // Sử dụng authApi.verifyOtp
+            const res = await authApi.verifyOTP(email, parseInt(otp));
+            if (res.status === 200) {
+                setStep(3);
+            }
         } catch (error) {
-            alert(error.response?.data || "Mã OTP không chính xác!");
+            alert(error.response?.data || "Mã OTP không chính xác hoặc đã hết hạn!");
         }
     };
 
-    // BƯỚC 3: ĐẶT LẠI MẬT KHẨU
+    // Bước 3: Đổi mật khẩu mới qua Gateway
     const handleResetPassword = async () => {
         if (password !== confirm) {
             alert("Mật khẩu xác nhận không khớp!");
             return;
         }
+        if (password.length < 6) {
+            alert("Mật khẩu phải có ít nhất 6 ký tự!");
+            return;
+        }
+
         try {
-            const res = await authApi.resetPassword(email, otp, password);
-            alert("Đổi mật khẩu thành công!");
-            navigate("/");
+            // Sử dụng authApi.resetPassword
+            const res = await authApi.resetPassword(email, parseInt(otp), password);
+            if (res.status === 200) {
+                alert("Đổi mật khẩu thành công! Vui lòng đăng nhập lại.");
+                navigate("/");
+            }
         } catch (error) {
-            alert(error.response?.data || "Lỗi reset mật khẩu!");
+            alert(error.response?.data || "Lỗi reset mật khẩu, vui lòng thử lại!");
         }
     };
 
     return (
         <div className="portal-container">
-            {/* BÊN TRÁI - Đồng bộ Hero Section */}
+            {/* BÊN TRÁI - Hero Section (Giữ nguyên giao diện đẹp của bạn) */}
             <div className="portal-hero-section">
                 <div className="hero-overlay">
                     <div className="hero-content">

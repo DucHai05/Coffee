@@ -35,8 +35,17 @@ public class NhanVienController {
 
     @DeleteMapping("/{maNhanVien}")
     public ResponseEntity<?> delete(@PathVariable String maNhanVien) {
-        nhanVienService.delete(maNhanVien);
-        return ResponseEntity.ok("Da xoa nhan vien");
+        try {
+            // Gọi service xử lý logic xóa/ẩn
+            nhanVienService.delete(maNhanVien);
+            return ResponseEntity.ok("Thao tác thành công");
+        } catch (RuntimeException e) {
+            // Trả về lỗi cụ thể nếu không tìm thấy nhân viên hoặc lỗi logic khác
+            return ResponseEntity.status(404).body(e.getMessage());
+        } catch (Exception e) {
+            // Lỗi hệ thống 500
+            return ResponseEntity.status(500).body("Lỗi hệ thống: " + e.getMessage());
+        }
     }
 
     @GetMapping("/exists/{maNhanVien}")

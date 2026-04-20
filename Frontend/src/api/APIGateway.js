@@ -111,9 +111,10 @@ export const khoApi = {
 // -----------------------------------------------------------
 const AUTH_API = `${GATEWAY_URL}/api/user/auth`;
 export const authApi = {
-    baseURL: () => `${BASE_URL}/user`,
+    baseURL: () => `${GATEWAY_URL}/user`,
     login: (data) => axios.post(`${AUTH_API}/login`, data),
     register: (data) => axios.post(`${AUTH_API}/register`, data),
+    changePassword: (data, token) => axios.post(`${AUTH_API}/change-password`, data, { headers: { Authorization: `Bearer ${token}` } }),
     forgotPassword: (email) => axios.post(`${AUTH_API}/forgot`, { email }),
     verifyOTP: (email, otp) => axios.post(`${AUTH_API}/verify-otp`, { email, otp: otp.toString() }),
     resetPassword: (email, otp, newPassword) => axios.post(`${AUTH_API}/reset`, { email, otp: otp.toString(), newPassword }),
@@ -149,7 +150,7 @@ export const employeeApi = {
 // -----------------------------------------------------------
 // TRONG APIGateway.js
 export const notificationApi = {
-     getAllNoti: () => axios.get(`${BASE_URL}/notification/notifications`),
+     getAllNoti: () => axios.get(`${GATEWAY_URL}/notification/notifications`),
      getByEmployee: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/list/${maNV}`),
      create: (data, token) => axios.post(`${GATEWAY_URL}/api/notification/notifications/create`, data, {
         headers: { Authorization: `Bearer ${token}` }
@@ -184,6 +185,22 @@ export const salaryApi = {
 
     getAll: (month, year, token) => axios.get(`${GATEWAY_URL}/api/salary/all`, {
         params: { thang: month, nam: year },
+        headers: { Authorization: `Bearer ${token}` }
+    }),
+
+    calculateAll: (month, year, token) => axios.post(`${GATEWAY_URL}/api/salary/calculate-all`, {
+        thang: month,
+        nam: year
+    }, {
+        headers: { Authorization: `Bearer ${token}` }
+    }),
+
+    pay: (maNV, month, year, token) => axios.put(`${GATEWAY_URL}/api/salary/pay/${maNV}`, null, {
+        params: { thang: month, nam: year },
+        headers: { Authorization: `Bearer ${token}` }
+    }),
+
+    create: (data, token) => axios.post(`${GATEWAY_URL}/api/salary/create`, data, {
         headers: { Authorization: `Bearer ${token}` }
     }),
 };

@@ -219,9 +219,10 @@ const Profile = () => {
                             {pwdError && <p className="error-msg">{pwdError}</p>}
 
                             <div className="modal-actions">
-                                <button className="btn-save" disabled={pwdLoading}>
+                                <button type="submit" className="btn-save" disabled={pwdLoading}>
                                     {pwdLoading ? "Đang xử lý..." : "Xác nhận"}
                                 </button>
+
                                 <button type="button" className="btn-cancel" onClick={() => setIsModalOpen(false)}>
                                     Hủy
                                 </button>

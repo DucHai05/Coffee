@@ -1,7 +1,7 @@
 package com.example.servicesalary.config;
 
-import jakarta.servlet.http.HttpServletResponse;
 import com.example.servicesalary.security.JwtFilter;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -31,17 +31,21 @@ public class SecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable) // Tắt cái này để hết lỗi 302
+                .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) ->
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Không có quyền truy cập"))
+                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized"))
+                        .accessDeniedHandler((request, response, accessDeniedException) ->
+                                response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/api/salary/**").hasAnyRole("ADMIN","STAFF") // Chỉ ADMIN
-                        .requestMatchers("/api/cham-cong/**").permitAll()
+                        .requestMatchers("/error").permitAll()
+                        .requestMatchers("/cham-cong/fix-ca-loi").hasRole("ADMIN")
+                        .requestMatchers("/cham-cong/**").authenticated()
+                        .requestMatchers("/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 );
 
@@ -52,20 +56,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // Sử dụng Pattern thay cho dấu sao (*)
-        // Pattern này chấp nhận mọi port chạy trên localhost (5173, 3000,...)
         configuration.setAllowedOriginPatterns(List.of("http://localhost:[*]"));
-
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept"));
-
-        // Khi cái này là true, AllowedOrigins tuyệt đối không được là "*"
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
-
 }

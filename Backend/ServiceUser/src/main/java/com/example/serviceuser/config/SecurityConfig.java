@@ -62,11 +62,14 @@ public class SecurityConfig {
                                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Forbidden"))
                 )
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.DELETE, "/api/user/nhan-vien/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers("/auth/login", "/auth/register", "/auth/forgot/**", "/auth/verify-otp", "/auth/reset").permitAll()
-                        .requestMatchers("/api/nhan-vien/me").hasAnyRole("STAFF", "ADMIN")
-                        .requestMatchers("/api/nhan-vien/**").hasAnyRole("ADMIN","STAFF")
-                        .anyRequest().authenticated()
+                        // Đã cắt /api/user -> Chỉ còn /nhan-vien
+                        .requestMatchers("/auth/change-password").authenticated()
+                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/nhan-vien/me").authenticated()
+                        .requestMatchers("/nhan-vien", "/nhan-vien/**").hasRole("ADMIN")
+                        .anyRequest().authenticated() // Nên để authenticated để an toàn
                 );
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

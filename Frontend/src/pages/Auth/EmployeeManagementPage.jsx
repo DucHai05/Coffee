@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
+import "./employee.css";
 // IMPORT FILE API TỔNG HỢP
 import { employeeApi } from '../../api/APIGateway';
-import "./employee.css";
 
 function EmployeeManagement() {
     const [employees, setEmployees] = useState([]);
@@ -18,15 +18,15 @@ function EmployeeManagement() {
 
     const [selectedRowId, setSelectedRowId] = useState(null);
 
-    // 1. Tải danh sách nhân viên - PHẢI CÓ TOKEN
+    // 1. Tải danh sách nhân viên qua Gateway
     const loadEmployees = useCallback(async () => {
+        const token = localStorage.getItem("token");
+        if (!token) return;
         try {
-            const token = localStorage.getItem("token"); // Lấy "giấy thông hành"
-            const res = await employeeApi.getAll(token); // Truyền token vào đây
+            const res = await employeeApi.getAll(token);
             setEmployees(res.data);
         } catch (error) {
             console.error("Lỗi tải dữ liệu qua Gateway:", error);
-            if (error.response?.status === 401) alert("Phiên đăng nhập hết hạn!");
         } finally {
             setLoading(false);
         }
@@ -51,55 +51,63 @@ function EmployeeManagement() {
         setSelectedRowId(null);
     };
 
-    // 2. Cập nhật nhân viên - CẦN TOKEN
+    // 2. Cập nhật nhân viên qua Gateway
     const handleUpdate = async () => {
         if (!formData.maNhanVien) return alert("Vui lòng chọn nhân viên từ bảng!");
+        const token = localStorage.getItem("token");
+        if (!token) return alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+
         try {
-            const token = localStorage.getItem("token");
             await employeeApi.update(formData.maNhanVien, formData, token);
             alert("Cập nhật thành công!");
             loadEmployees();
             handleReset();
-        } catch { alert("Lỗi cập nhật! Kiểm tra quyền ADMIN."); }
+        } catch (error) { 
+            alert(error.response?.data || "Lỗi cập nhật!"); 
+        }
     };
 
-    // 3. Thêm mới nhân viên - CẦN TOKEN
+    // 3. Thêm mới nhân viên qua Gateway
     const handleAdd = async () => {
         if (!formData.tenNhanVien || !formData.tenDangNhap) {
             return alert("Vui lòng nhập đầy đủ Tên nhân viên và Email!");
         }
+        const token = localStorage.getItem("token");
+        if (!token) return alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+
         try {
-            const token = localStorage.getItem("token");
             await employeeApi.create(formData, token);
             alert("Thêm nhân viên thành công!");
             loadEmployees();
             handleReset();
         } catch (error) {
-            console.error("Lỗi khi thêm:", error);
-            alert("Lỗi: " + (error.response?.data || "Không có quyền thực hiện."));
+            console.error("Lỗi khi thêm qua Gateway:", error);
+            alert("Lỗi: " + (error.response?.data || "Không thể thêm nhân viên."));
         }
     };
 
-    // 4. Xóa nhân viên - CẦN TOKEN
+    // 4. Xóa nhân viên qua Gateway
     const handleDelete = async () => {
-        if (!selectedRowId) return alert("Vui lòng chọn nhân viên cần xóa!");
+        if (!selectedRowId) return alert("Vui lòng chọn nhân viên!");
+        const token = localStorage.getItem("token");
+        if (!token) return alert("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
 
-        const confirmDelete = window.confirm(`Xác nhận xóa nhân viên [${formData.tenNhanVien}]?`);
-        if (confirmDelete) {
+        if (window.confirm(`Xác nhận xóa nhân viên [${formData.tenNhanVien}]?`)) {
             try {
-                const token = localStorage.getItem("token");
+                // Gọi hàm delete từ APIGateway
                 await employeeApi.delete(selectedRowId, token);
-                alert("Xóa thành công!");
-                loadEmployees();
-                handleReset();
+
+                alert("Thành công: Tài khoản đã bị xóa & Nhân viên được cập nhật trạng thái.");
+                loadEmployees(); // Load lại bảng
+                handleReset();   // Xóa trắng form
             } catch (error) {
-                console.error("Lỗi khi xóa:", error);
-                alert("Lỗi: Không thể xóa qua Gateway.");
+                console.error("Lỗi xóa:", error);
+                alert("Lỗi: " + (error.response?.data || "Hệ thống không thể xóa nhân viên này."));
             }
         }
     };
 
-    if (loading) return <div className="loading">Đang tải Lado Coffee...</div>;
+    if (loading) return <div className="loading">Đang tải dữ liệu nhân sự...</div>;
 
     return (
         <div className="admin-container">
@@ -110,7 +118,7 @@ function EmployeeManagement() {
                 <div className="form-grid">
                     <div className="input-group">
                         <label>Mã Nhân Viên:</label>
-                        <input type="text" value={formData.maNhanVien} disabled className="readonly-input"  />
+                        <input type="text" value={formData.maNhanVien} disabled className="readonly-input" />
                     </div>
                     <div className="input-group">
                         <label>Tên Nhân Viên:</label>
@@ -156,7 +164,6 @@ function EmployeeManagement() {
 
             <div className="list-section">
                 <legend>Danh sách nhân viên</legend>
-                {/* Bọc bảng vào div responsive và giới hạn chiều cao nếu cần */}
                 <div className="table-responsive">
                     <table className="employee-table">
                         <thead>
@@ -180,7 +187,7 @@ function EmployeeManagement() {
                                 <td>{emp.tenNhanVien}</td>
                                 <td>{emp.ngaySinh}</td>
                                 <td>{emp.chucVu}</td>
-                                <td className="salary-col">{emp.tienLuong?.toLocaleString()}</td>
+                                <td className="salary-col">{emp.tienLuong?.toLocaleString()} đ</td>
                                 <td>{emp.taiKhoan ? emp.taiKhoan.tenDangNhap : "Chưa có TK"}</td>
                             </tr>
                         ))}

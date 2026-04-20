@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,6 +18,7 @@ public interface NhanVienRepository extends JpaRepository<NhanVien, String> {
 
     @Query("SELECT nv FROM NhanVien nv JOIN nv.taiKhoan tk WHERE tk.tenDangNhap = :username")
     Optional<NhanVien> findByUsernameFromAccount(@Param("username") String username);
+    List<NhanVien> findByTrangThai(String trangThai);
 
     // 1. Lấy tên theo Mã nhân viên (Trả về String cho nhẹ)
     @Query("SELECT n.tenNhanVien FROM NhanVien n WHERE n.maNhanVien = :maNV")
