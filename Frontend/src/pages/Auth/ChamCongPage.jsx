@@ -108,8 +108,7 @@ const ChamCong = () => {
         }
     };
 
-    /**
-     * Sửa ca lỗi (Chỉ dành cho ADMIN)
+    /** Sửa ca lỗi
      */
     const handleFixError = async () => {
         if (!fixTime) return alert("Vui lòng chọn giờ ra!");
@@ -121,7 +120,8 @@ const ChamCong = () => {
                 day: Number(selectedDayInfo.day || selectedDayInfo.DAY),
                 month: Number(viewDate.month),
                 year: Number(viewDate.year),
-                gioRaMoi: fixTime
+                gioRaMoi: fixTime,
+                role: role //ADMIN hoặc STAFF từ localstorage
             }, token);
             
             alert("Đã cập nhật giờ làm thành công!");
@@ -129,6 +129,7 @@ const ChamCong = () => {
             setSelectedDayInfo(null);
             await syncData();
         } catch (error) {
+            console.error("Server Error:", error.response?.data);
             alert(error.response?.data || "Lỗi cập nhật!");
         } finally {
             setLoading(false);
@@ -239,7 +240,7 @@ const ChamCong = () => {
                     !selectedDayInfo.noRecord &&
                     !selectedDayInfo.isProcessing &&
                     Number(selectedDayInfo.totalHours || selectedDayInfo.TOTALHOURS || 0) === 0 &&
-                    role === 'ADMIN' && (
+                    (role === 'ADMIN' || role === 'STAFF') && (
                         <div className="cc-fix-section">
                             <hr />
                             <h4>Sửa ca lỗi ngày {selectedDayInfo.day || selectedDayInfo.DAY}</h4>

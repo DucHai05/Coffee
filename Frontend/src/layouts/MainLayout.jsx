@@ -66,7 +66,7 @@ const MainLayout = () => {
       onConnect: () => {
         console.log(`🟢 Đã kết nối WebSocket thành công cho user: ${maNhanVien}`);
         
-        // Lắng nghe đúng kênh của nhân viên này
+        // 1: Kênh cá nhân: Lắng nghe đúng kênh của nhân viên này
         client.subscribe(`/topic/notifications/${maNhanVien}`, (message) => {
           const newNotification = JSON.parse(message.body);
           
@@ -75,6 +75,16 @@ const MainLayout = () => {
           setUnreadCount(prev => prev + 1);
           setNotifications(prev => [newNotification, ...prev]);
         });
+        // 2. THÊM ĐOẠN NÀY: Kênh nhóm cho Quản lý
+        // Nếu người đang đăng nhập có quyền ADMIN, họ sẽ nghe thêm kênh 'ADMIN_GROUP'
+        if (userRole === 'ADMIN') {
+          client.subscribe(`/topic/notifications/ADMIN_GROUP`, (message) => {
+            const newNotification = JSON.parse(message.body);
+            playAudioAlert(); // Tiếng chuông báo
+            setUnreadCount(prev => prev + 1); // Tăng số lượng tin chưa đọc trên chuông
+            setNotifications(prev => [newNotification, ...prev]); // Đẩy tin nhắn mới lên đầu danh sách
+          });
+        }
       },
       onDisconnect: () => console.log("🔴 Đã ngắt kết nối WebSocket"),
     });

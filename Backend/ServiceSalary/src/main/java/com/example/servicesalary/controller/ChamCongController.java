@@ -88,7 +88,7 @@ public class ChamCongController {
             if (maNV.isEmpty()) {
                 return ResponseEntity.badRequest().body("Thiếu mã nhân viên");
             }
-
+            String role = Objects.toString(payload.get("role"), "STAFF").trim();
             int d = parseInt(payload.get("day"), "day");
             int m = parseInt(payload.get("month"), "month");
             int y = parseInt(payload.get("year"), "year");
@@ -97,7 +97,7 @@ public class ChamCongController {
                 return ResponseEntity.badRequest().body("Thiếu giờ ra mới");
             }
 
-            return ResponseEntity.ok(chamCongService.fixCaLoi(maNV, d, m, y, gioRa));
+            return ResponseEntity.ok(chamCongService.fixCaLoi(maNV, d, m, y, gioRa, role));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

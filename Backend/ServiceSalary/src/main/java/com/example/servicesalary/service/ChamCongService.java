@@ -1,9 +1,11 @@
 package com.example.servicesalary.service;
 
+import com.example.servicesalary.client.NotificationClient;
 import com.example.servicesalary.dto.ChamCongDTO;
 import com.example.servicesalary.entity.ChamCong;
 import com.example.servicesalary.repository.ChamCongRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,13 +15,13 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class ChamCongService {
+    @Autowired
+    private NotificationClient notificationClient;
     private static final ZoneId VIETNAM_ZONE = ZoneId.of("Asia/Ho_Chi_Minh");
 
     private final ChamCongRepository repo;
@@ -97,7 +99,7 @@ public class ChamCongService {
     }
 
     @Transactional
-    public ChamCong fixCaLoi(String maNV, int d, int m, int y, String gioRaMoi) {
+    public ChamCong fixCaLoi(String maNV, int d, int m, int y, String gioRaMoi, String role) {
         ChamCong cc = repo.findErrorShift(maNV, d, m, y, "Lỗi ca")
                 .orElseThrow(() -> new RuntimeException(
                         "Không tìm thấy bản ghi 'Lỗi ca' nào cho ngày " + d + "/" + m + " trong hệ thống!"
@@ -120,6 +122,23 @@ public class ChamCongService {
         double hours = Duration.between(cc.getThoiGianVao(), dateTimeRa).getSeconds() / 3600.0;
         cc.setSoGioLam(Math.round(hours * 100.0) / 100.0);
 
-        return repo.save(cc);
+        ChamCong savedCC = repo.save(cc);
+        // 2. Gửi thông báo nếu người sửa là nhân viên thường
+        if ("STAFF".equals(role)) {
+            try {
+                Map<String, Object> body = new HashMap<>();
+                body.put("maNhanVien", "ADMIN_GROUP"); // Mã quy ước cho các Quản lý
+                body.put("tieuDe", "Cập nhật ca lỗi");
+                body.put("noiDung", "Nhân viên " + maNV + " đã tự sửa giờ ra ngày " + d + "/" + m + " thành " + gioRaMoi);
+                body.put("loaiThongBao", "FIX_CHAM_CONG");
+                body.put("idThamChieu", maNV);
+                body.put("daDoc", false);
+
+                notificationClient.send(body);
+            } catch (Exception e) {
+                System.err.println("Lỗi gửi thông báo: " + e.getMessage());
+            }
+        }
+        return savedCC;
     }
 }
