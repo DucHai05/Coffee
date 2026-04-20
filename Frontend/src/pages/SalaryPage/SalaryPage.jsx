@@ -134,7 +134,6 @@ function SalaryManagement() {
         setLoading(true);
         try {
             const token = localStorage.getItem("token");
-            // Sử dụng salaryApi.calculateAll(month, year, token)
             await salaryApi.calculateAll(filter.thang, filter.nam, token);
             alert("Đã tổng hợp lương thành công!");
             loadData();

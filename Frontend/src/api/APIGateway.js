@@ -119,7 +119,6 @@ export const authApi = {
     verifyOTP: (email, otp) => axios.post(`${AUTH_API}/verify-otp`, { email, otp: otp.toString() }),
     resetPassword: (email, otp, newPassword) => axios.post(`${AUTH_API}/reset`, { email, otp: otp.toString(), newPassword }),
     getProfile: (token) => axios.get(`${GATEWAY_URL}/api/user/nhan-vien/me`, { headers: { Authorization: `Bearer ${token}` } }),
-
 };
 
 // APIGateway.js
