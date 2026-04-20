@@ -42,8 +42,20 @@ export const chiTietHDApi = {
 export const promoApi = {
     getActivePromos: () => axios.get(`${GATEWAY_URL}/api/promotion/promotions/active`),
     getAllPromos: () => axios.get(`${GATEWAY_URL}/api/promotion/promotions`),
+    createPromo: (payload) => axios.post(`${GATEWAY_URL}/api/promotion/promotions`, payload),
+    
+    // Cập nhật khuyến mãi (theo ID)
+    updatePromo: (id, payload) => axios.put(`${GATEWAY_URL}/api/promotion/promotions/${id}`, payload),
+    
+    // Xóa khuyến mãi
+    deletePromo: (id) => axios.delete(`${GATEWAY_URL}/api/promotion/promotions/${id}`),
+    
+    // Cập nhật trạng thái (Toggle On/Off)
+    // Lưu ý: Đường dẫn /status tùy thuộc vào Backend của bạn thiết kế
+    updateStatus: (id) => axios.patch(`${GATEWAY_URL}/api/promotion/promotions/${id}/status`),
+
     getConfigsByPromo: (maKM) => axios.get(`${GATEWAY_URL}/api/promotion/promotion-configs/promo/${maKM}`),
-    // ... các hàm khác giữ nguyên tiền tố /api/promotion
+    
 };
 
 // -----------------------------------------------------------
@@ -62,7 +74,7 @@ export const productApi = {
 export const orderApi = {
     // Trang Order cần lấy danh sách sản phẩm qua Gateway
     getProducts: () => axios.get(`${GATEWAY_URL}/api/product/v1/san-pham`), 
-    
+    removeOrderItem: (maChiTietHD) => axios.delete(`${GATEWAY_URL}/api/cafe/orders/remove-item/${maChiTietHD}`),
     loadBan: (maBan) => axios.get(`${GATEWAY_URL}/api/cafe/orders/loadBan/${maBan}`),
     staffCreate: (orderData) => axios.post(`${GATEWAY_URL}/api/cafe/orders/staff-create`, orderData),
     finalPayment: (paymentPayload) => axios.post(`${GATEWAY_URL}/api/cafe/payments/final-payment`, paymentPayload),

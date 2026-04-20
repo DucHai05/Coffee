@@ -13,7 +13,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/promotion-configs")
-@CrossOrigin(origins = "http://localhost:5173", allowedHeaders = "*", allowCredentials = "true")
 public class KhuyenMaiConfigController {
 
     @Autowired

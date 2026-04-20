@@ -28,7 +28,7 @@ const PromotionPage = () => {
     const [promotions, setPromotions] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('event');
-
+    const [categories, setCategories] = useState([]);
     // --- STATE CHO MODAL CRUD ---
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingId, setEditingId] = useState(null); 
@@ -91,7 +91,7 @@ const PromotionPage = () => {
         setIsModalOpen(true);
     };
 
-const handleSave = async (e) => {
+    const handleSave = async (e) => {
     e.preventDefault();
     
     // Tạo bản sao dữ liệu, nếu là thêm mới thì bỏ maKhuyenMai ra
