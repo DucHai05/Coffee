@@ -32,9 +32,11 @@ export const khuVucApi = {
     delete: (id) => axios.delete(`${GATEWAY_URL}/api/table/khuvuc/${id}`),
 };
 
+
 export const chiTietHDApi = {
     getByHoaDon: (maHoaDon) => axios.get(`${GATEWAY_URL}/api/cafe/chitiethd/hoadon/${maHoaDon}`),
 };
+
 
 // -----------------------------------------------------------
 // 2. SERVICE PROMOTION (Gateway: /api/promotion/**)
@@ -85,7 +87,9 @@ export const caApi = {
 
 export const doanhthuApi = {
     getMaCaDangMo: () => axios.get(`${GATEWAY_URL}/api/doanhthu/ca/getMaCaDangMo`),
+
     getByCa: (maCa) => axios.get(`${GATEWAY_URL}/api/doanhthu/doanhthu/ca/${maCa}`),
+
     getAll: () => axios.get(`${GATEWAY_URL}/api/doanhthu/doanhthu`),
     updateAfterPayment: (maCa, phuongThuc, soTien) => {
         const payload = { amount: soTien, method: phuongThuc };
@@ -111,15 +115,12 @@ export const khoApi = {
 // -----------------------------------------------------------
 const AUTH_API = `${GATEWAY_URL}/api/user/auth`;
 export const authApi = {
-    baseURL: () => `${GATEWAY_URL}/user`,
     login: (data) => axios.post(`${AUTH_API}/login`, data),
     register: (data) => axios.post(`${AUTH_API}/register`, data),
-    changePassword: (data, token) => axios.post(`${AUTH_API}/change-password`, data, { headers: { Authorization: `Bearer ${token}` } }),
     forgotPassword: (email) => axios.post(`${AUTH_API}/forgot`, { email }),
     verifyOTP: (email, otp) => axios.post(`${AUTH_API}/verify-otp`, { email, otp: otp.toString() }),
     resetPassword: (email, otp, newPassword) => axios.post(`${AUTH_API}/reset`, { email, otp: otp.toString(), newPassword }),
     getProfile: (token) => axios.get(`${GATEWAY_URL}/api/user/nhan-vien/me`, { headers: { Authorization: `Bearer ${token}` } }),
-
 };
 
 // APIGateway.js
@@ -148,17 +149,16 @@ export const employeeApi = {
 // -----------------------------------------------------------
 // 8. SERVICE NOTIFICATION (Gateway: /api/notification/**)
 // -----------------------------------------------------------
-// TRONG APIGateway.js
+
 export const notificationApi = {
-     getAllNoti: () => axios.get(`${GATEWAY_URL}/notification/notifications`),
-     getByEmployee: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/list/${maNV}`),
-     create: (data, token) => axios.post(`${GATEWAY_URL}/api/notification/notifications/create`, data, {
-        headers: { Authorization: `Bearer ${token}` }
-    }),
+    getByEmployee: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/list/${maNV}`),
     
     // Giữ các hàm khác
     getUnreadCount: (maNV) => axios.get(`${GATEWAY_URL}/api/notification/notifications/unread-count/${maNV}`),
     markAsRead: (id) => axios.put(`${GATEWAY_URL}/api/notification/notifications/read/${id}`),
+    create: (data, token) => axios.post(`${GATEWAY_URL}/api/notification/notifications/create`, data, {
+        headers: { Authorization: `Bearer ${token}` }
+    }),
 };
 
 // -----------------------------------------------------------
@@ -187,22 +187,6 @@ export const salaryApi = {
         params: { thang: month, nam: year },
         headers: { Authorization: `Bearer ${token}` }
     }),
-
-    calculateAll: (month, year, token) => axios.post(`${GATEWAY_URL}/api/salary/calculate-all`, {
-        thang: month,
-        nam: year
-    }, {
-        headers: { Authorization: `Bearer ${token}` }
-    }),
-
-    pay: (maNV, month, year, token) => axios.put(`${GATEWAY_URL}/api/salary/pay/${maNV}`, null, {
-        params: { thang: month, nam: year },
-        headers: { Authorization: `Bearer ${token}` }
-    }),
-
-    create: (data, token) => axios.post(`${GATEWAY_URL}/api/salary/create`, data, {
-        headers: { Authorization: `Bearer ${token}` }
-    }),
 };
 
 export const loaiSanPhamApi = {
@@ -214,4 +198,6 @@ export const loaiSanPhamApi = {
 
 
 export const saveToken = (token) => localStorage.setItem("token", token);
+
 export const logout = () => { localStorage.removeItem("token"); window.location.href = "/login"; };
+

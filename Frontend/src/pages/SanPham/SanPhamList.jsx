@@ -143,7 +143,7 @@ return (
                 <thead>
                     <tr>
                         <th>Ảnh</th>
-                        <th>Mã SP</th>
+                        {/* <th>Mã SP</th> */}
                         <th>Tên Sản Phẩm</th>
                         <th>Loại</th>
                         <th>Đơn giá</th>
@@ -166,7 +166,7 @@ return (
                                         )}
                                     </div>
                                 </td>
-                                <td style={{fontWeight: '700'}}>{sp.maSanPham}</td>
+                                {/* <td style={{fontWeight: '700'}}>{sp.maSanPham}</td> */}
                                 <td style={{textAlign: 'left', fontWeight: '600'}}>{sp.tenSanPham}</td>
                                 <td>{sp.tenLoaiSanPham || sp.maLoaiSanPham || 'Chưa phân loại'}</td>
                                 <td style={{color: 'var(--danger)', fontWeight: '800'}}>

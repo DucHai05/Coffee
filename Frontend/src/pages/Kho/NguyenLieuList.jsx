@@ -79,7 +79,7 @@ const NguyenLieuList = () => {
             <table className="inventory-table">
                 <thead>
                     <tr>
-                        <th style={{ width: '15%' }}>Mã</th>
+
                         <th style={{ width: '35%', textAlign: 'left' }}>Tên Nguyên Liệu</th>
                         <th style={{ width: '15%' }}>Tồn Kho</th>
                         <th style={{ width: '10%' }}>Đơn Vị</th>
@@ -92,7 +92,6 @@ const NguyenLieuList = () => {
                         const isLow = nl.soLuong <= (nl.nguongCanhBao ?? 10);
                         return (
                             <tr key={nl.maNguyenLieu} className={isLow ? "row-danger" : ""}>
-                                <td className="ma-nl">{nl.maNguyenLieu}</td>
                                 <td className="ten-nl">
                                     {nl.tenNguyenLieu} 
                                     {isLow && <span className="badge-lado bg-danger text-white ms-2">Sắp hết!</span>}

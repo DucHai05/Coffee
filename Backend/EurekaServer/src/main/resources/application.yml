@@ -1,9 +1,5 @@
 server:
-<<<<<<< HEAD
-  port: 8761
-=======
   port: ${PORT:8761}
->>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
 
 spring:
   application:
@@ -11,21 +7,6 @@ spring:
 
 eureka:
   instance:
-<<<<<<< HEAD
-    hostname: localhost
-  client:
-    # Vì đây là Server, nó không cần tự đăng ký chính nó
-    register-with-eureka: false
-    # Nó cũng không cần đi lấy danh sách từ server khác (trừ khi chạy Cluster)
-    fetch-registry: false
-    service-url:
-      defaultZone: http://${eureka.instance.hostname}:${server.port}/eureka/
-
-  server:
-    # Tắt chế độ "Tự bảo vệ" để tránh dòng chữ EMERGENCY màu đỏ khi Dev
-    enable-self-preservation: false
-    # Thời gian quét để gỡ bỏ các service đã "chết" (tính bằng ms)
-=======
     # Ưu tiên dùng IP để các service con dễ tìm thấy server hơn
     prefer-ip-address: true
   client:
@@ -37,5 +18,4 @@ eureka:
 
   server:
     enable-self-preservation: false
->>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
     eviction-interval-timer-in-ms: 5000

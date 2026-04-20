@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+// Đã xóa bỏ import axios ở đây
 import { employeeApi, notificationApi } from '../../api/APIGateway';
 import './baoKhoForm.css';
 
@@ -20,7 +20,8 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
             setBaoKhoItems([...baoKhoItems, {
                 maNguyenLieu: nl.maNguyenLieu,
                 tenNguyenLieu: nl.tenNguyenLieu,
-                noiDung: `Tồn kho hiện tại: ${nl.soLuong} ${nl.donViTinh}`
+                tonKho: `Tồn kho: ${nl.soLuong} ${nl.donViTinh}`, 
+                lyDo: '' 
             }]);
         }
     };
@@ -32,7 +33,8 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
             const allItems = filteredNguyenLieus.map(nl => ({
                 maNguyenLieu: nl.maNguyenLieu,
                 tenNguyenLieu: nl.tenNguyenLieu,
-                noiDung: `Tồn kho hiện tại: ${nl.soLuong} ${nl.donViTinh}`
+                tonKho: `Tồn kho: ${nl.soLuong} ${nl.donViTinh}`, 
+                lyDo: '' 
             }));
             setBaoKhoItems(allItems);
         }
@@ -40,64 +42,63 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
 
     const handleChangeReason = (maNguyenLieu, newReason) => {
         setBaoKhoItems(baoKhoItems.map(item =>
-            item.maNguyenLieu === maNguyenLieu ? { ...item, noiDung: newReason } : item
+            item.maNguyenLieu === maNguyenLieu ? { ...item, lyDo: newReason } : item
         ));
     };
 
     const handleSubmitAllBaoKho = async () => {
-    if (baoKhoItems.length === 0) return;
+        if (baoKhoItems.length === 0) return;
 
-    // Lấy token từ localStorage (phải khớp với key bạn lưu khi Login)
-    const token = localStorage.getItem('token'); 
-    
-    // In ra log để tự kiểm tra xem token có bị null không
-    console.log("Token hiện tại:", token); 
+        const token = localStorage.getItem('token'); 
 
-    try {
-        // 2. GỌI TRỰC TIẾP BẰNG AXIOS ĐỂ ÉP HEADER
-        const responseUser = await employeeApi.getAll(token);
-        
-        const danhSachQuanLy = responseUser.data
-            .map(nv => nv.maNhanVien)
-            .filter(ma => ma && ma.startsWith('QL'));
+        try {
+            // 1. Gọi gọn gàng qua APIGateway
+            const responseUser = await employeeApi.getAll(token);
+            
+            const danhSachQuanLy = responseUser.data
+                .map(nv => nv.maNhanVien)
+                .filter(ma => ma && ma.startsWith('QL'));
 
-        if (danhSachQuanLy.length === 0) {
-            alert("Không tìm thấy Quản lý nào trong hệ thống để gửi báo cáo!");
-            return;
+            if (danhSachQuanLy.length === 0) {
+                alert("Không tìm thấy Quản lý nào trong hệ thống để gửi báo cáo!");
+                return;
+            }
+
+            // Gộp nội dung
+            const noiDungGop = baoKhoItems.map((item) => {
+                const phanLyDo = item.lyDo.trim() !== '' ? ` - Ghi chú: ${item.lyDo}` : '';
+                return `- ${item.tenNguyenLieu} (${item.tonKho})${phanLyDo}`;
+            }).join('\n');
+            
+            // 2. Gửi thông báo gọn gàng qua APIGateway
+            const promises = danhSachQuanLy.map(maQL => 
+                notificationApi.create({
+                    maNhanVien: maQL,
+                    tieuDe: `Báo cáo kho (${baoKhoItems.length} nguyên liệu)`,
+                    noiDung: noiDungGop,
+                    loaiThongBao: 'KHO',
+                    idThamChieu: null
+                }, token)
+            );
+
+            await Promise.all(promises);
+
+            alert(`Đã gửi báo cáo tự động tới ${danhSachQuanLy.length} Quản lý thành công!`);
+            setBaoKhoItems([]);
+            onClose(); 
+        } catch (error) {
+            console.error("Lỗi:", error);
+            if (error.response?.status === 401) {
+                alert("Phiên đăng nhập hết hạn! Vui lòng đăng xuất và đăng nhập lại.");
+            } else {
+                alert("Đã xảy ra lỗi kết nối hệ thống!");
+            }
         }
-
-        const noiDungGop = baoKhoItems.map((item) => `- ${item.tenNguyenLieu}: ${item.noiDung}`).join('\n');
-        
-        // 3. GỬI THÔNG BÁO BẰNG AXIOS TRỰC TIẾP
-        const promises = danhSachQuanLy.map(maQL => 
-           notificationApi.create({ 
-                maNhanVien: maQL,
-                tieuDe: `Báo cáo kho (${baoKhoItems.length} nguyên liệu)`,
-                noiDung: noiDungGop,
-                loaiThongBao: 'KHO',
-                idThamChieu: null
-            }, token) // Truyền payload và token vào hàm create
-        );
-
-        await Promise.all(promises);
-
-        alert(`Đã gửi báo cáo tự động tới ${danhSachQuanLy.length} Quản lý thành công!`);
-        setBaoKhoItems([]);
-        onClose(); 
-    } catch (error) {
-        console.error("Lỗi:", error);
-        if (error.response?.status === 401) {
-            alert("Phiên đăng nhập hết hạn! Vui lòng đăng xuất và đăng nhập lại.");
-        } else {
-            alert("Đã xảy ra lỗi kết nối hệ thống!");
-        }
-    }
-};
+    };
 
   return (
     <div className="bk-container">
         <div className="bk-card">
-            {/* Header với Badge số lượng */}
             <div className="bk-header">
                 <h3>🔔 Tạo Báo Cáo Nguyên Liệu</h3>
                 <span className="badge bg-danger">Món đã chọn: {baoKhoItems.length}</span>
@@ -105,7 +106,6 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
 
             <div className="bk-body">
                 <div className="row">
-                    {/* CỘT TRÁI: DANH SÁCH CHỌN */}
                     <div className="col-md-5 border-end pe-4">
                         <div className="bk-column-title">1. Chọn nguyên liệu cần báo</div>
                         <input 
@@ -157,7 +157,6 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
                         </div>
                     </div>
 
-                    {/* CỘT PHẢI: CHI TIẾT LÝ DO */}
                     <div className="col-md-7 ps-4">
                         <div className="bk-column-title">2. Chi tiết nội dung gửi Quản lý</div>
                         <div className="bk-table-area">
@@ -179,10 +178,12 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
                                                 <tr key={item.maNguyenLieu}>
                                                     <td className="fw-bold text-primary">{item.tenNguyenLieu}</td>
                                                     <td>
+                                                        <div className="mb-1 text-danger small fw-bold">{item.tonKho}</div>
                                                         <input 
                                                             type="text" 
                                                             className="bk-reason-input" 
-                                                            value={item.noiDung} 
+                                                            placeholder="Nhập thêm ghi chú/lý do..."
+                                                            value={item.lyDo} 
                                                             onChange={(e) => handleChangeReason(item.maNguyenLieu, e.target.value)} 
                                                         />
                                                     </td>
@@ -197,7 +198,6 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
                 </div>
             </div>
 
-            {/* Footer với các nút bấm bo góc đồng bộ */}
             <div className="bk-footer">
                 <button type="button" className="btn-lado btn-back" onClick={onClose}>Quay lại</button>
                 <button 

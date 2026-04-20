@@ -1,9 +1,8 @@
-<<<<<<< HEAD
+
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 # Dùng tên chính xác hoặc dùng wildcard né chữ plain
 COPY build/libs/*-SNAPSHOT.jar app.jar
-=======
 # Giai đoạn 1: Build mã nguồn bằng Gradle
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
@@ -25,5 +24,5 @@ COPY --from=build /app/build/libs/*.jar app.jar
 # Service User thường chạy ở port 8086 (theo cấu hình Gateway của bạn)
 EXPOSE 8086
 
->>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

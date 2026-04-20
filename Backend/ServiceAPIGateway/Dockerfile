@@ -1,11 +1,10 @@
-<<<<<<< HEAD
+
 # Dành cho Gateway
 FROM eclipse-temurin:17-jre-alpine
 # Chỉ dùng dấu sao đơn giản, bỏ qua ARG JAR_FILE
 COPY build/libs/ServiceAPIGateway-0.0.1-SNAPSHOT.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app.jar"]
-=======
 # Giai đoạn 1: Sử dụng Gradle để build dự án từ mã nguồn
 FROM gradle:8.5-jdk17 AS build
 WORKDIR /app
@@ -28,4 +27,4 @@ EXPOSE 8080
 
 # Chạy ứng dụng
 ENTRYPOINT ["java", "-jar", "app.jar"]
->>>>>>> c18f9dd6d403e3e90dd2b342a984881f2ccbafb7
+

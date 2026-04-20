@@ -70,7 +70,7 @@ export default function LoaiSanPhamList() {
                 <table className="loaisp-table">
                     <thead>
                         <tr>
-                            <th style={{ width: '20%' }}>Mã Loại</th>
+                            {/* <th style={{ width: '20%' }}>Mã Loại</th> */}
                             <th style={{ width: '55%', textAlign: 'left' }}>Tên Loại Sản Phẩm</th>
                             <th style={{ width: '25%' }}>Thao tác</th>
                         </tr>
@@ -88,7 +88,7 @@ export default function LoaiSanPhamList() {
                         ) : (
                             danhSachLoai.map((loai) => (
                                 <tr key={loai.maLoaiSanPham}>
-                                    <td className="ma-loai">{loai.maLoaiSanPham}</td>
+                                    {/* <td className="ma-loai">{loai.maLoaiSanPham}</td> */}
                                     <td className="ten-loai text-left">
                                         <span className="bullet-point"></span>
                                         {loai.tenLoaiSanPham}

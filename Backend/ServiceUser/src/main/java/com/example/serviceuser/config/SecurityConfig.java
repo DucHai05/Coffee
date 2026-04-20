@@ -64,14 +64,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.DELETE, "/api/user/nhan-vien/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        // Đã cắt /api/user -> Chỉ còn /nhan-vien
                         .requestMatchers("/auth/change-password").authenticated()
                         .requestMatchers("/auth/**").permitAll()
                         .requestMatchers("/nhan-vien/me").authenticated()
-                        .requestMatchers("/nhan-vien", "/nhan-vien/**").hasRole("ADMIN")
-                        .anyRequest().authenticated() // Nên để authenticated để an toàn
+                        
+                        // --- THÊM DÒNG NÀY ---
+                        // Cho phép mọi user đã đăng nhập được GET danh sách nhân viên
+                        .requestMatchers(HttpMethod.GET, "/nhan-vien").authenticated() 
+                        
+                        // Giữ nguyên các thao tác POST, PUT, DELETE cho ADMIN
+                        .requestMatchers("/nhan-vien", "/nhan-vien/**").hasRole("ADMIN") 
+                        
+                        .anyRequest().authenticated()
                 );
-
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
