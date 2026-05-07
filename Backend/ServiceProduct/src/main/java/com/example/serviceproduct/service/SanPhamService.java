@@ -1,5 +1,6 @@
 package com.example.serviceproduct.service;
 
+import com.example.serviceproduct.dto.response.CongThucResponse;
 import com.example.serviceproduct.dto.response.SanPhamResponse;
 import com.example.serviceproduct.entity.CongThuc;
 import com.example.serviceproduct.entity.LoaiSanPham;
@@ -39,8 +40,18 @@ public class SanPhamService {
             dto.setMaLoaiSanPham(sp.getLoaiSanPham().getMaLoaiSanPham());
             dto.setTenLoaiSanPham(sp.getLoaiSanPham().getTenLoaiSanPham());
         }
-        // Thêm dòng này:
-        dto.setDanhSachCongThuc(sp.getDanhSachCongThuc()); 
+        // Convert CongThuc entities to CongThucResponse DTOs
+        if (sp.getDanhSachCongThuc() != null) {
+            List<CongThucResponse> dtoList = sp.getDanhSachCongThuc().stream()
+                    .map(ct -> {
+                        CongThucResponse ctDto = new CongThucResponse();
+                        ctDto.setMaNguyenLieu(ct.getMaNguyenLieu());
+                        ctDto.setSoLuong(ct.getSoLuong());
+                        return ctDto;
+                    })
+                    .collect(Collectors.toList());
+            dto.setDanhSachCongThuc(dtoList);
+        }
         return dto;
     }).collect(Collectors.toList());
 }
@@ -86,7 +97,18 @@ public class SanPhamService {
             dto.setMaLoaiSanPham(sp.getLoaiSanPham().getMaLoaiSanPham());
             dto.setTenLoaiSanPham(sp.getLoaiSanPham().getTenLoaiSanPham());
         }
-        dto.setDanhSachCongThuc(sp.getDanhSachCongThuc()); 
+        // Convert CongThuc entities to CongThucResponse DTOs
+        if (sp.getDanhSachCongThuc() != null) {
+            List<CongThucResponse> dtoList = sp.getDanhSachCongThuc().stream()
+                    .map(ct -> {
+                        CongThucResponse ctDto = new CongThucResponse();
+                        ctDto.setMaNguyenLieu(ct.getMaNguyenLieu());
+                        ctDto.setSoLuong(ct.getSoLuong());
+                        return ctDto;
+                    })
+                    .collect(Collectors.toList());
+            dto.setDanhSachCongThuc(dtoList);
+        }
         return dto;
     }
 }

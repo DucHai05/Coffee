@@ -9,7 +9,6 @@ import com.example.servicecafe.dto.SanPhamResponseDTO;
 import com.example.servicecafe.entity.*;
 import com.example.servicecafe.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +38,6 @@ public class ThanhToanService {
     @Autowired
     private StoreClient storeClient;
 
-    @Modifying
     @Transactional
     public void xuLyThanhToan(PaymentDTO dto) {
         try {
@@ -95,8 +93,10 @@ public class ThanhToanService {
                     // LOGIC GỌI SANG SERVICE-PRODUCT LẤY CÔNG THỨC
                     // ==========================================
                     try {
+                        System.out.println(">>> [DEBUG] Đang lấy công thức cho sản phẩm: " + itemDto.getMaSanPham());
                         SanPhamResponseDTO sanPham = sanPhamClient.getSanPhamById(itemDto.getMaSanPham());
                         if (sanPham != null && sanPham.getDanhSachCongThuc() != null) {
+                            System.out.println(">>> [DEBUG] Tìm thấy " + sanPham.getDanhSachCongThuc().size() + " công thức");
                             for (CongThucDTO ctDTO : sanPham.getDanhSachCongThuc()) {
                                 String maNL = ctDTO.getMaNguyenLieu();
                                 // Số lượng cần trừ = Số lượng NL trong 1 công thức * Số lượng món khách gọi
@@ -104,12 +104,15 @@ public class ThanhToanService {
                                 
                                 // Cộng dồn vào Map
                                 mapNguyenLieuCanTru.put(maNL, mapNguyenLieuCanTru.getOrDefault(maNL, 0.0) + soLuongTru);
+                                System.out.println(">>> [DEBUG] Công thức: Mã NL=" + maNL + ", SL=" + soLuongTru);
                             }
+                        } else {
+                            System.out.println(">>> [WARNING] Không có công thức cho SP: " + itemDto.getMaSanPham());
                         }
                     } catch (Exception e) {
                         System.err.println(">>> [WARNING] Không lấy được công thức cho SP: " + itemDto.getMaSanPham() + ". Lỗi: " + e.getMessage());
-                        // Sửa dòng này trong Service của bạn
-                        System.err.println(">>> [KIEM TRA MOI] Dang goi sang port 8087, ma SP: " + itemDto.getMaSanPham());
+                        e.printStackTrace();
+                        System.err.println(">>> [KIEM TRA MOI] Dang goi sang service-product, ma SP: " + itemDto.getMaSanPham());
                     }
                 }
                 chiTietRepository.saveAll(chiTiets);
@@ -118,12 +121,16 @@ public class ThanhToanService {
             // ==========================================
             // LOGIC GỌI SANG SERVICE-STORE ĐỂ TRỪ KHO
             // ==========================================
+            System.out.println(">>> [DEBUG] mapNguyenLieuCanTru = " + mapNguyenLieuCanTru);
+            System.out.println(">>> [DEBUG] Kích thước map: " + mapNguyenLieuCanTru.size());
+            
             if (!mapNguyenLieuCanTru.isEmpty()) {
                 List<TruKhoRequest> dsTruKho = new ArrayList<>();
                 for (Map.Entry<String, Double> entry : mapNguyenLieuCanTru.entrySet()) {
                     TruKhoRequest req = new TruKhoRequest();
                     req.setMaNguyenLieu(entry.getKey());
                     req.setSoLuongTru(entry.getValue());
+                    System.out.println(">>> [DEBUG] Thêm vào danh sách trừ kho: Mã=" + entry.getKey() + ", SL=" + entry.getValue());
                     dsTruKho.add(req);
                 }
 

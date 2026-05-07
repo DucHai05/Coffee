@@ -1,9 +1,8 @@
 package com.example.serviceproduct.dto.response;
 
-import com.example.serviceproduct.entity.CongThuc;
-
 import lombok.Data;
 import java.util.List; 
+
 @Data
 public class SanPhamResponse {
     private String maSanPham;
@@ -13,5 +12,5 @@ public class SanPhamResponse {
     private String trangThai;
     private String maLoaiSanPham;
     private String tenLoaiSanPham;
-    private List<CongThuc> danhSachCongThuc;
+    private List<CongThucResponse> danhSachCongThuc;
 }
