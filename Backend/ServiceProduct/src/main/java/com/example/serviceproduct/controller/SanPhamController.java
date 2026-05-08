@@ -1,5 +1,6 @@
 package com.example.serviceproduct.controller;
 
+import com.example.serviceproduct.dto.response.SanPhamDTO;
 import com.example.serviceproduct.dto.response.SanPhamResponse;
 import com.example.serviceproduct.entity.CongThuc;
 import com.example.serviceproduct.entity.SanPham;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/san-pham")
@@ -23,9 +25,11 @@ public class SanPhamController {
     public ResponseEntity<List<SanPhamResponse>> getAll() {
         return ResponseEntity.ok(sanPhamService.getAllSanPham());
     }
+
     @GetMapping("/{id}")
-    public ResponseEntity<SanPhamResponse> getById(@PathVariable String id) {
-        return ResponseEntity.ok(sanPhamService.getSanPhamById(id));
+    public SanPhamDTO getById(@PathVariable String id) {
+        SanPhamResponse response = sanPhamService.getSanPhamById(id);
+        return convertToDTO(response);
     }
 
     // POST: /api/v1/san-pham
@@ -39,5 +43,24 @@ public class SanPhamController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         sanPhamService.deleteSanPham(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Helper method để convert SanPhamResponse → SanPhamDTO
+    private SanPhamDTO convertToDTO(SanPhamResponse response) {
+        SanPhamDTO dto = new SanPhamDTO();
+        dto.setMaSanPham(response.getMaSanPham());
+        dto.setTenSanPham(response.getTenSanPham());
+        dto.setDonGia(response.getDonGia());
+        dto.setDuongDanHinh(response.getDuongDanHinh());
+        dto.setTrangThai(response.getTrangThai());
+        dto.setMaLoaiSanPham(response.getMaLoaiSanPham());
+        dto.setTenLoaiSanPham(response.getTenLoaiSanPham());
+
+        if (response.getDanhSachCongThuc() != null) {
+            dto.setDanhSachCongThuc(response.getDanhSachCongThuc().stream()
+                    .map(ct -> new SanPhamDTO.CongThucDTO(ct.getMaNguyenLieu(), ct.getSoLuong()))
+                    .collect(Collectors.toList()));
+        }
+        return dto;
     }
 }

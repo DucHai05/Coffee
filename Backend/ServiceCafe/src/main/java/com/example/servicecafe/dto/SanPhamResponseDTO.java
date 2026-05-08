@@ -8,7 +8,10 @@ public class SanPhamResponseDTO {
     private String maSanPham;
     private String tenSanPham;
     private Double donGia;
+    private String duongDanHinh;
     private String trangThai;
+    private String maLoaiSanPham;
+    private String tenLoaiSanPham;
     
     // Biến này đặc biệt quan trọng để chứa danh sách công thức
     private List<CongThucDTO> danhSachCongThuc; 
