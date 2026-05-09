@@ -12,6 +12,8 @@ const NguyenLieuList = () => {
     // Lưu tạm data khi muốn sửa
     const [editData, setEditData] = useState(null);
 
+    const getSoLuongToiThieu = (nl) => nl.soLuongToiThieu ?? nl.nguongCanhBao ?? 0;
+
     useEffect(() => {
         loadData();
     }, []);
@@ -38,8 +40,8 @@ const NguyenLieuList = () => {
 
     const getSortedData = () => {
         return [...nguyenLieus].sort((a, b) => {
-            const aLow = a.soLuong <= (a.nguongCanhBao ?? 10);
-            const bLow = b.soLuong <= (b.nguongCanhBao ?? 10);
+            const aLow = a.soLuong <= getSoLuongToiThieu(a);
+            const bLow = b.soLuong <= getSoLuongToiThieu(b);
             if (aLow && !bLow) return -1;
             if (!aLow && bLow) return 1;
             return 0;
@@ -89,7 +91,8 @@ const NguyenLieuList = () => {
                 </thead>
                 <tbody>
                     {getSortedData().map((nl) => {
-                        const isLow = nl.soLuong <= (nl.nguongCanhBao ?? 10);
+                        const soLuongToiThieu = getSoLuongToiThieu(nl);
+                        const isLow = nl.soLuong <= soLuongToiThieu;
                         return (
                             <tr key={nl.maNguyenLieu} className={isLow ? "row-danger" : ""}>
                                 <td className="ten-nl">
@@ -100,7 +103,7 @@ const NguyenLieuList = () => {
                                     {nl.soLuong}
                                 </td>
                                 <td className="don-vi">{nl.donViTinh}</td>
-                                <td className="don-vi" style={{ opacity: 0.6 }}>{nl.nguongCanhBao ?? 10}</td>
+                                <td className="don-vi" style={{ opacity: 0.6 }}>{soLuongToiThieu}</td>
                                 <td style={{ textAlign: 'center' }}>
                                     <button className="btn-table btn-edit" onClick={() => { setEditData(nl); setCurrentView('FORM'); }}>Sửa</button>
                                     <button className="btn-table btn-delete" onClick={() => handleDelete(nl.maNguyenLieu)}>Xóa</button>

@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import java.util.List;
 
-@FeignClient(name = "service-store")
+@FeignClient(name = "service-store", path = "/nguyen-lieu")
 public interface StoreClient {
     // Gọi API trừ kho mà chúng ta vừa tạo ban nãy
-    @PostMapping("/nguyen-lieu/tru-kho")
+   @PostMapping(value = "/tru-kho", consumes = "application/json", produces = "application/json")
     void truKhoNguyenLieu(@RequestBody List<TruKhoRequest> requests);
 }

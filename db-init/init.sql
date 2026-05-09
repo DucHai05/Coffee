@@ -215,6 +215,7 @@ CREATE TABLE [dbo].[NguyenLieu](
 	[maNguyenLieu] [varchar](20) NOT NULL PRIMARY KEY,
 	[donViTinh] [nvarchar](20) NULL,
 	[soLuong] [float] NULL,
+	[soLuongToiThieu] [float] NULL DEFAULT 0,
 	[tenNguyenLieu] [nvarchar](100) NULL
 );
 GO

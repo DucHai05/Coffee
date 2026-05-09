@@ -19,4 +19,7 @@ public class NguyenLieu {
 
     @Column(name = "donViTinh", columnDefinition = "NVARCHAR(20)")
     private String donViTinh;
+     @Column(name = "soLuongToiThieu")
+    private Double soLuongToiThieu;
+    
 }

@@ -1,20 +1,47 @@
 import React, { useState } from 'react';
 import { khoApi } from '../../api/APIGateway';
 import './nguyenLieuForm.css';
+
+const createDefaultFormData = () => ({
+    maNguyenLieu: 'NL' + Date.now(),
+    tenNguyenLieu: '',
+    soLuong: 0,
+    donViTinh: 'Gam',
+    soLuongToiThieu: 0
+});
+
+const normalizeFormData = (data) => {
+    const defaults = createDefaultFormData();
+    const source = data || {};
+
+    return {
+        maNguyenLieu: source.maNguyenLieu ?? defaults.maNguyenLieu,
+        tenNguyenLieu: source.tenNguyenLieu ?? defaults.tenNguyenLieu,
+        soLuong: source.soLuong ?? defaults.soLuong,
+        donViTinh: source.donViTinh ?? defaults.donViTinh,
+        soLuongToiThieu: source.soLuongToiThieu ?? source.nguongCanhBao ?? defaults.soLuongToiThieu
+    };
+};
+
 const NguyenLieuForm = ({ isEditing, initialData, onClose, onRefresh }) => {
     // Quản lý state của riêng form này
-    const [formData, setFormData] = useState(initialData || {
-        maNguyenLieu: 'NL' + Date.now(),
-        tenNguyenLieu: '',
-        soLuong: 0,
-        donViTinh: 'Gam',
-        nguongCanhBao: 10
-    });
+    const [formData, setFormData] = useState(() => normalizeFormData(initialData));
 
     const handleSave = async (e) => {
         e.preventDefault();
         try {
-            await khoApi.create(formData);
+            const payload = {
+                ...formData,
+                soLuong: Number(formData.soLuong),
+                soLuongToiThieu: Number(formData.soLuongToiThieu)
+            };
+
+            console.log('[KHO][SAVE] isEditing =', isEditing, 'payload =', payload);
+            const response = isEditing
+                ? await khoApi.update(payload.maNguyenLieu, payload)
+                : await khoApi.create(payload);
+
+            console.log('[KHO][SAVE] response =', response.data);
             alert("Lưu thông tin thành công!");
             onRefresh(); // Gọi hàm load lại bảng của component cha
             onClose();   // Đóng form
@@ -93,8 +120,8 @@ const NguyenLieuForm = ({ isEditing, initialData, onClose, onRefresh }) => {
                                 <input 
                                     type="number" 
                                     className="nl-input input-warning" 
-                                    value={formData.nguongCanhBao} 
-                                    onChange={e => setFormData({ ...formData, nguongCanhBao: e.target.value })} 
+                                    value={formData.soLuongToiThieu} 
+                                    onChange={e => setFormData({ ...formData, soLuongToiThieu: e.target.value })} 
                                 />
                             </div>
                         </div>

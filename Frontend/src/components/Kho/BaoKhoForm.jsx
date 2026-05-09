@@ -6,6 +6,7 @@ import './baoKhoForm.css';
 const BaoKhoForm = ({ nguyenLieus, onClose }) => {
     const [baoKhoItems, setBaoKhoItems] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
+    const getSoLuongToiThieu = (nl) => nl.soLuongToiThieu ?? nl.nguongCanhBao ?? 0;
 
     const filteredNguyenLieus = nguyenLieus.filter(nl =>
         nl.tenNguyenLieu.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -134,7 +135,7 @@ const BaoKhoForm = ({ nguyenLieus, onClose }) => {
                                 <div className="p-4 text-center text-muted">Không có dữ liệu</div>
                             ) : (
                                 filteredNguyenLieus.map(nl => {
-                                    const isLow = nl.soLuong <= (nl.nguongCanhBao ?? 10);
+                                    const isLow = nl.soLuong <= getSoLuongToiThieu(nl);
                                     const isChecked = baoKhoItems.some(item => item.maNguyenLieu === nl.maNguyenLieu);
                                     return (
                                         <label key={nl.maNguyenLieu} className={`bk-item-label ${isChecked ? 'selected' : ''}`}>

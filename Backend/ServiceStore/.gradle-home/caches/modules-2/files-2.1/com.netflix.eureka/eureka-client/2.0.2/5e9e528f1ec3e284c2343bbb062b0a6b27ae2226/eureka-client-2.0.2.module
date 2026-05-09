@@ -1,0 +1,481 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.netflix.eureka",
+    "module": "eureka-client",
+    "version": "2.0.2",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.5.1"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.netflix.netflix-commons",
+          "module": "netflix-eventbus",
+          "version": {
+            "requires": "0.3.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.thoughtworks.xstream",
+          "module": "xstream",
+          "version": {
+            "requires": "1.4.19"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.netflix.archaius",
+          "module": "archaius-core",
+          "version": {
+            "requires": "0.7.6"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "jakarta.ws.rs",
+          "module": "jakarta.ws.rs-api",
+          "version": {
+            "requires": "3.0.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "jakarta.inject",
+          "module": "jakarta.inject-api",
+          "version": {
+            "requires": "2.0.1"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "jakarta.annotation",
+          "module": "jakarta.annotation-api",
+          "version": {
+            "requires": "2.1.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.netflix.servo",
+          "module": "servo-core",
+          "version": {
+            "requires": "0.12.21"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "org.apache.httpcomponents",
+          "module": "httpclient",
+          "version": {
+            "requires": "4.5.3"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.google.code.findbugs",
+          "module": "jsr305",
+          "version": {
+            "requires": "3.0.2"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "commons-configuration",
+          "module": "commons-configuration",
+          "version": {
+            "requires": "1.10"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.github.vlsi.compactmap",
+          "module": "compactmap",
+          "version": {
+            "requires": "2.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-annotations",
+          "version": {
+            "requires": "2.10.5"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.10.5"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.10.5.1"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        }
+      ],
+      "files": [
+        {
+          "name": "eureka-client-2.0.2.jar",
+          "url": "eureka-client-2.0.2.jar",
+          "size": 404259,
+          "sha512": "6af5de487bcb62344278dab5df9ebcaceb9aff58e78449377d02d3b42a6e793d3a1a484d36de983787256912938c9239a6172c5ca9d9241cc8023758fbb5db4c",
+          "sha256": "d1838a9e28392e1c49d4cd8c3d7650bd2d17c5edf370cf07596b01f9df4aefcd",
+          "sha1": "74459b89111e886ff091b6b9595ac411deef7ab8",
+          "md5": "15a2ca95de649ba1bf4fe0cc4652172b"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 8,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.netflix.netflix-commons",
+          "module": "netflix-eventbus",
+          "version": {
+            "requires": "0.3.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.thoughtworks.xstream",
+          "module": "xstream",
+          "version": {
+            "requires": "1.4.19"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.netflix.archaius",
+          "module": "archaius-core",
+          "version": {
+            "requires": "0.7.6"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "jakarta.ws.rs",
+          "module": "jakarta.ws.rs-api",
+          "version": {
+            "requires": "3.0.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "jakarta.inject",
+          "module": "jakarta.inject-api",
+          "version": {
+            "requires": "2.0.1"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "jakarta.annotation",
+          "module": "jakarta.annotation-api",
+          "version": {
+            "requires": "2.1.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.netflix.servo",
+          "module": "servo-core",
+          "version": {
+            "requires": "0.12.21"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "org.apache.httpcomponents",
+          "module": "httpclient",
+          "version": {
+            "requires": "4.5.3"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.google.code.findbugs",
+          "module": "jsr305",
+          "version": {
+            "requires": "3.0.2"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "commons-configuration",
+          "module": "commons-configuration",
+          "version": {
+            "requires": "1.10"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.github.vlsi.compactmap",
+          "module": "compactmap",
+          "version": {
+            "requires": "2.0"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-annotations",
+          "version": {
+            "requires": "2.10.5"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.10.5"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.10.5.1"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        },
+        {
+          "group": "org.codehaus.jettison",
+          "module": "jettison",
+          "version": {
+            "requires": "1.5.4"
+          },
+          "excludes": [
+            {
+              "group": "org.glassfish.jersey",
+              "module": "*"
+            }
+          ]
+        }
+      ],
+      "files": [
+        {
+          "name": "eureka-client-2.0.2.jar",
+          "url": "eureka-client-2.0.2.jar",
+          "size": 404259,
+          "sha512": "6af5de487bcb62344278dab5df9ebcaceb9aff58e78449377d02d3b42a6e793d3a1a484d36de983787256912938c9239a6172c5ca9d9241cc8023758fbb5db4c",
+          "sha256": "d1838a9e28392e1c49d4cd8c3d7650bd2d17c5edf370cf07596b01f9df4aefcd",
+          "sha1": "74459b89111e886ff091b6b9595ac411deef7ab8",
+          "md5": "15a2ca95de649ba1bf4fe0cc4652172b"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "eureka-client-2.0.2-javadoc.jar",
+          "url": "eureka-client-2.0.2-javadoc.jar",
+          "size": 1132474,
+          "sha512": "0a148bf88bd470d57cfe0c8ccf3e8b27fd5716caad35744ffab27b7b4e0cdcc2e569aad5d6a5f63760acfe97fc56d90ff02430026b86f004a7094c31fd763df1",
+          "sha256": "38e1bcb461b7152049684bcb9aa29f82f6a738816155fd4ced7c899ba8c93a00",
+          "sha1": "66820297dd2886297ef3480ea400a8cdaf518c09",
+          "md5": "dd45caf7dc3c50d7d28b4ac0a71a696d"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "eureka-client-2.0.2-sources.jar",
+          "url": "eureka-client-2.0.2-sources.jar",
+          "size": 233695,
+          "sha512": "733ec170ce8355483f2c8743dfda9ea305caff4b80aeff9d235ea099bcc95add12879de4601d1f65b05193973af298d9d3859f35a7a16ce59dce99c253d8c446",
+          "sha256": "ac3f4b0deae9184a8fad89e2159e7c2e42608e2acad2e80d532f2646febc2615",
+          "sha1": "99be79b86ac1929dd19ac4db80cc20c5cb475ca0",
+          "md5": "bf64cc22c768a1b368c776803394de4e"
+        }
+      ]
+    }
+  ]
+}

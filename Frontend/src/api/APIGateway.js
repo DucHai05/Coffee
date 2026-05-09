@@ -118,6 +118,8 @@ export const phieuThuChiApi = {
 export const khoApi = {
     getAll: () => axios.get(`${GATEWAY_URL}/api/store/nguyen-lieu`), // Sửa /api/kho thành /api/store
     create: (data) => axios.post(`${GATEWAY_URL}/api/store/nguyen-lieu`, data),
+    update: (id, data) => axios.put(`${GATEWAY_URL}/api/store/nguyen-lieu/${id}`, data),
+    delete: (id) => axios.delete(`${GATEWAY_URL}/api/store/nguyen-lieu/${id}`),
 };
 
 // -----------------------------------------------------------
